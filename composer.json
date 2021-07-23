@@ -1,0 +1,12 @@
+{
+	"name" : "queue-fair/adapter",
+	"description" : "The Queue-Fair Server-Side Adapter keeps your queues secure and prevents a crashed website. You will need a Queue-Fair account - get one at https://queue-fair.com/free-trial",
+	"version" : "2.5.3",
+	"require" : {
+		"php" : ">=5.4.0"
+	},
+	"licence" : "MIT",
+	"autoload" : {
+		"classmap" : ["./"]
+	}
+}
