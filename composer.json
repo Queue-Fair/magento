@@ -1,7 +1,6 @@
 {
 	"name" : "queue-fair/magentoadapter",
 	"description" : "The Queue-Fair Server-Side Adapter keeps your queues secure and prevents a crashed site. You will need a Queue-Fair account - get one at https://queue-fair.com/free-trial",
-	"version" : "v2.5.3",
 	"require" : {
 		"php" : ">=5.4.0"
 	},
