@@ -54,30 +54,40 @@ Here's every keystroke for the install.
 
 ```
     sudo mkdir /opt/qfsettings    
-    `sudo chmod 777 /opt/qfsettings
+    sudo chmod 777 /opt/qfsettings
 ```
 
 Note: The settings folder can go anywhere, but for maximum security this should not be in your web root.  The executable permission is needed on the folder so that the Adapter can examine its contents.  You can see your Queue-Fair settings in the Portal File Manager - they are updated when you hit Make Live.
 
 2) **VERY IMPORTANT:** Make sure the system clock on your webserver is accurately set to network time! On unix systems, this is usually done with the ntp package.  It doesn't matter which timezone you are using.  For Debian/Ubuntu:
 
-    `sudo apt-get install ntp`
+```
+    sudo apt-get install ntp
+```
 
 3) Go to your Magento installation:
 
-    `cd /path/to/magento`
+```
+    cd /path/to/magento
+```
 
 4) Add the Server-Side extension to your composer requirements:
 
-    `composer require queue-fair/magentoadapter --no-update`
+```
+    composer require queue-fair/magentoadapter --no-update
+```
 
 5) Update composer
 
-    `composer update`
+```
+    composer update
+```
 
 6) This will create a new folder `/path/to/magento/vendor/queue-fair/magentoadapter` - and next edit `vendor/queue-fair/magentoadapter/queue-fair-adapter.php`
 
-    `nano vendor/queue-fair/magentoadapter/queue-fair-adapter.php`
+```
+    nano vendor/queue-fair/magentoadapter/queue-fair-adapter.php
+```
 
 7) At the top of `queue-fair-adapter.php` set your account name and account secret to the account System Name and Account Secret shown on the Your Account page of the Queue-Fair portal.  
 
@@ -91,21 +101,24 @@ Note: The settings folder can go anywhere, but for maximum security this should 
 
 The debug logging statements will appear in whichever file php has been set-up to output error message information. If using Apache, it will appear in the apache error.log, and you can see the messages with
 
+```
     sudo tail -f /var/log/apache2/error.log | sed 's/\\n/\n/g'
+```
 
 12) When you have finished making changes to `queue-fair-adapter.php`, hit `CTRL-O` to save and `CTRL-X` to exit nano.
 
 13) To make the Adapter actually run, you need to edit the master Magento index.php file
 
-    `nano /path/to/magento/pub/index.php`
-
+```
+    nano /path/to/magento/pub/index.php
+```
 and just after the opening `<?php` tag, on the second line, add
 
+```
 if(strpos($_SERVER["REQUEST_URI"],"/rest/") === false && strpos($_SERVER["REQUEST_URI"],"/ajax/") === false) { 
-	   require_once "../vendor/queue-fair/magentoadapter/QueueFairConfig.php";
+    require_once "../vendor/queue-fair/magentoadapter/QueueFairConfig.php";
     
-    $queueFairConfig = new QueueFair\Adapter\QueueFairConfig();
-    $queueFair = new QueueFair\Adapter\QueueFairAdapter($queueFairConfig);
+    $queueFair = new QueueFair\Adapter\QueueFairAdapter(new QueueFair\Adapter\QueueFairConfig());
     
     $queueFair->requestedURL=(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://").$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
     $queueFair->query=$_SERVER["QUERY_STRING"];
@@ -116,11 +129,9 @@ if(strpos($_SERVER["REQUEST_URI"],"/rest/") === false && strpos($_SERVER["REQUES
     if(!$queueFair->go()) {
 	       exit();
     }
-//Clean up.
     unset($queueFair);
-    unset($queueFairConfig);
 }
-
+```
 This will ensure that the adapter is the first thing that runs when a vistor accesses any page, which is necessary both to protect your server from load from lots of visitors and also so that the adapter can set the necessary cookies.  You can then use the Activation Rules in the Portal to set which pages on your site may trigger a queue.  **NOTE:** If your Magento server is sitting behind a proxy, CDN or load balancer, you may need to edit property sets to use values from forwarded headers instead.  If you need help with this, contact Queue-Fair support.
 
 The `if` statement prevents the Adapter from running on background Magento AJAX and RestAPI calls - you really only want the Adapter to run on page requests.
@@ -131,12 +142,14 @@ Tap `CTRL-O` to save and `CTRL-X` to exit nano.
 
 **NOTE** *Alternatively*, if you want to use the Queue-Fair classes elsewhere within PHP with Magento (not as the first line of `index.php`), you might want to AutoLoad them.  To do this, add the following lines to /vendor/queue-fair/magentoadapter/composer.json and do a `composer update`
 
-`"autoload" : {
+```
+"autoload" : {
     "classmap" : ["./"]
-}`
+}
+```
 
 That's it you're done!
-
+---
 ### To test the Server-Side Adapter
 
 Use a queue that is not in use on other pages, or create a new queue for testing.
@@ -162,7 +175,7 @@ Go back to the Portal and put the queue in Demo mode on the Queue Settings page.
 
 **IMPORTANT:**  Once you are sure the Server-Side Adapter is working as expected, remove the Client-Side JavaScript Adapter tag from your pages, and don't forget to disable debug level logging in queue-fair-adapter.php, and also set settingsFileCacheLifetimeMinutes to at least 5.
 
-
+---
 ### For maximum security
 
 The Server-Side Adapter contains multiple checks to prevent visitors bypassing the queue, either by tampering with set cookie values or query strings, or by sharing this information with each other.  When a tamper is detected, the visitor is treated as a new visitor, and will be sent to the back of the queue if people are queuing.
@@ -173,6 +186,7 @@ The Server-Side Adapter contains multiple checks to prevent visitors bypassing t
  -  The Server-Side Adapter also checks that passed cookies were produced within the time limit set by Passed Lifetime on the queue Settings page, to prevent visitors trying to cheat by tampering with cookie expiration times or sharing cookie values.  So, the Passed Lifetime should be set to long enough for your visitors to complete their transaction, plus an allowance for those visitors that are slow, but no longer.
  - The signature also includes the visitor's USER_AGENT, to further prevent visitors from sharing cookie values.
 
+---
 ## AND FINALLY
 
 All client-modifiable settings are in `queue-fair-adapter.php` .  You should never find you need to modify `queue-fair-adapter-library.php` - but if something comes up, please contact support@queue-fair.com right away so we can discuss your requirements.
