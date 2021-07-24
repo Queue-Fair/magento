@@ -97,7 +97,7 @@ The debug logging statements will appear in whichever file php has been set-up t
 
     `nano /path/to/magento/pub/index.php`
 
-and just after the opening <?php tag, on the second line, add
+and just after the opening `<?php` tag, on the second line, add
 
     require_once "../vendor/queue-fair/magentoadapter/queue-fair-adapter.php";
 
