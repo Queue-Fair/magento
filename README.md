@@ -1,12 +1,12 @@
-﻿# Queue-Fair Adapter Magento Installation Guide
+?# Queue-Fair Adapter Magento Installation Guide
 
 Queue-Fair can be added to any Magento installation easily in minutes.  You will need a Queue-Fair account - please visit https://queue-fair.com/free-trial if you don't already have one.  You should also have received our Technical Guide.
 
-## Client Side JavaScript Adapter
+## Client-Side JavaScript Adapter
 
-Most of our customers prefer to use the Client Side JavaScript Adapter, which is suitable for all sites that wish solely to protect against overload.
+Most of our customers prefer to use the Client-Side JavaScript Adapter, which is suitable for all sites that wish solely to protect against overload.
 
-To add the Queue-Fair Client Side JavaScript Adapter, you don't need the PHP files included in this extension.
+To add the Queue-Fair Client-Side JavaScript Adapter, you don't need the PHP files included in this extension.
 
 Instead, perform the following steps:
 
@@ -28,22 +28,22 @@ There is a helpful video of these steps in action at https://magefan.com/blog/ho
 
 And you're done!  Your queues and activation rules can now be configured in the Queue-Fair Portal.
 
-## Server Side Adapter
+## Server-Side Adapter
 
-The Server Side Adapter means that your Magento server communicates directly with the Queue-Fair servers, rather than your visitors' browsers.
+The Server-Side Adapter means that your Magento server communicates directly with the Queue-Fair servers, rather than your visitors' browsers.
 
-This can introduce a dependency between our systems, which is why most customers prefer the Client Side Adapter.
+This can introduce a dependency between our systems, which is why most customers prefer the Client-Side Adapter.
 
-The Server Side Adapter is preferred in the following use cases:
+The Server-Side Adapter is preferred in the following use cases:
 
  - where you have technically skilled visitors or high value limited quantity product, and people may attempt to skip the queue, OR
  - where it is anticipated that your web server will not cope with the volume of traffic to your home or landing page AND you do not or cannot use the Direct Link integration method (see Technical Guide).
 
-The Server Side Adapter is a small PHP library that will run the first time each visitor accesses your site.  If it determines that the visitor should be queued, the visitor is sent to our Queue Servers and execution and generation of the page for that HTTP request for that visitor will cease.  If the Adapter determines that the visitor should not be queued, it sets a cookie to indicate that the visitor has been processed and your page executes and shows as normal.
+The Server-Side Adapter is a small PHP library that will run the first time each visitor accesses your site.  If it determines that the visitor should be queued, the visitor is sent to our Queue Servers and execution and generation of the page for that HTTP request for that visitor will cease.  If the Adapter determines that the visitor should not be queued, it sets a cookie to indicate that the visitor has been processed and your page executes and shows as normal.
 
-Thus the Server Side Adapter prevents visitors from skipping the queue by disabling the Client Side JavaScript Adapter, and also reduces load on your Magento server when things get busy.
+Thus the Server-Side Adapter prevents visitors from skipping the queue by disabling the Client-Side JavaScript Adapter, and also reduces load on your Magento server when things get busy.
 
-You will need PHP version 5.4 or above to run the Server Side Adapter.
+You will need PHP version 5.4 or above to run the Server-Side Adapter.
 
 Here's every keystroke you need.
 
@@ -62,7 +62,7 @@ Note: The settings folder can go anywhere, but for maximum security this should 
 
     `cd /path/to/magento`
 
-4) Add the Server Side extension to your composer requirements:
+4) Add the Server-Side extension to your composer requirements:
 
     `composer require queue-fair/magentoadapter --no-update`
 
@@ -136,12 +136,12 @@ Go back to the Portal and put the queue in Demo mode on the Queue Settings page.
 
 ### For maximum security
 
-The Server Side Adapter contains multiple checks to prevent visitors bypassing the queue, either by tampering with set cookie values or query strings, or by sharing this information with each other.  When a tamper is detected, the visitor is treated as a new visitor, and will be sent to the back of the queue if people are queuing.
+The Server-Side Adapter contains multiple checks to prevent visitors bypassing the queue, either by tampering with set cookie values or query strings, or by sharing this information with each other.  When a tamper is detected, the visitor is treated as a new visitor, and will be sent to the back of the queue if people are queuing.
 
- - The Server Side Adapter checks that Passed Cookies and Passed Strings presented by web browsers have been signed by our Queue-Server.  It uses the Secret visible on each queue's Settings page to do this.
+ - The Server-Side Adapter checks that Passed Cookies and Passed Strings presented by web browsers have been signed by our Queue-Server.  It uses the Secret visible on each queue's Settings page to do this.
  - If you change the queue Secret, this will invalidate everyone's cookies and also cause anyone in the queue to lose their place, so modify with care!
- - The Server Side Adapter also checks that Passed Strings coming from our Queue Server to your web server were produced within the last 30 seconds, which is why your clock must be accurately set.
- -  The Server Side adapater also checks that passed cookies were produced within the time limit set by Passed Lifetime on the queue Settings page, to prevent visitors trying to cheat by tampering with cookie expiration times or sharing cookie values.  So, the Passed Lifetime should be set to long enough for your visitors to complete their transaction, plus an allowance for those visitors that are slow, but no longer.
+ - The Server-Side Adapter also checks that Passed Strings coming from our Queue Server to your web server were produced within the last 30 seconds, which is why your clock must be accurately set.
+ -  The Server-Side adapater also checks that passed cookies were produced within the time limit set by Passed Lifetime on the queue Settings page, to prevent visitors trying to cheat by tampering with cookie expiration times or sharing cookie values.  So, the Passed Lifetime should be set to long enough for your visitors to complete their transaction, plus an allowance for those visitors that are slow, but no longer.
  - The signature also includes the visitor's USER_AGENT, to further prevent visitors from sharing cookie values.
  - The Adapter is by default configured to let known 'good' bots through without any checks (such as the Google Spider).  For maximum security we recommend removing the good bot check by performing the comment operation indicated in `queue-fair-adapter.php` while people are likely to be queueing, and then reinstating it afterwards.
 
@@ -151,4 +151,5 @@ The Server Side Adapter contains multiple checks to prevent visitors bypassing t
 All customer-modifiable settings are in `queue-fair-adapter.php` .  You should never find you need to modify `queue-fair-adapter-library.php` - but if something comes up, please contact support@queue-fair.com right away so we can discuss your requirements.
 
 Remember we are here to help you! The integration process shouldn't take you more than an hour - so if you are scratching your head, ask us.  Many answers are contained in the Technical Guide too.  We're always happy to help!
+
 
