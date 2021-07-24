@@ -140,7 +140,7 @@ In the case where the Adapter sends the request elsewhere (for example to show t
 
 Tap `CTRL-O` to save and `CTRL-X` to exit nano.  
 
-**NOTE** *Alternatively*, if you want to use the Queue-Fair classes elsewhere within PHP with Magento (not as the first line of `index.php`), you might want to AutoLoad them.  This is not recommended as the loading the Magento framework will likely be too onerous when your server is under heavy load, but if you want to do it anyway, add the following lines to /vendor/queue-fair/magentoadapter/composer.json and do a `composer update`
+**NOTE** *Alternatively*, if you want to use the Queue-Fair classes elsewhere within PHP with Magento (not as the first line of `index.php`), you might want to AutoLoad them.  This is not recommended as loading the Magento framework will likely be too onerous when your server is under heavy load, but if you want to do it anyway, add the following lines to /vendor/queue-fair/magentoadapter/composer.json and do a `composer update`
 
 ```
 "autoload" : {
