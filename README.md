@@ -119,15 +119,15 @@ if(strpos($_SERVER["REQUEST_URI"],"/rest/") === false && strpos($_SERVER["REQUES
     
     $queueFair = new QueueFair\Adapter\QueueFairAdapter(new QueueFair\Adapter\QueueFairConfig());
     
-    $queueFair->requestedURL=(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://")
+    $queueFair->requestedURL = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://")
         .$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
-    $queueFair->query=$_SERVER["QUERY_STRING"];
-    $queueFair->remoteAddr=$_SERVER["REMOTE_ADDR"];
-    $queueFair->userAgent=$_SERVER["HTTP_USER_AGENT"];
-    $queueFair->cookies=$_COOKIE;
+    $queueFair->query = $_SERVER["QUERY_STRING"];
+    $queueFair->remoteAddr = $_SERVER["REMOTE_ADDR"];
+    $queueFair->userAgent = $_SERVER["HTTP_USER_AGENT"];
+    $queueFair->cookies = $_COOKIE;
     
     if(!$queueFair->go()) {
-	       exit();
+        exit();
     }
     unset($queueFair);
 }
