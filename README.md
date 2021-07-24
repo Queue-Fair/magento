@@ -16,7 +16,7 @@ Instead, perform the following steps:
  4. In Other Settings, expand HTML Head
  5. In Scripts and Style Sheets, copy and paste the following line of code: 
 
-<script data-queue-fair-client="CLIENT_NAME" src="https://files.queue-fair.net/queue-fair-adapter.js"></script>
+`<script data-queue-fair-client="CLIENT_NAME" src="https://files.queue-fair.net/queue-fair-adapter.js"></script>`
 
  6. Replace CLIENT_NAME with the account system name visibile on the Account -> Your Account page of the Queue-Fair Portal
  7.  Save Configuration
@@ -49,30 +49,30 @@ Here's every keystroke you need.
 
 1) Create a readable, writable and executable folder so that your Queue-Fair settings can be locally saved (necessary for performance of your web server under load):
 
-    sudo mkdir /opt/qfsettings
-    sudo chmod 777 /opt/qfsettings
+    `sudo mkdir /opt/qfsettings`
+    `sudo chmod 777 /opt/qfsettings`
 
 Note: The settings folder can go anywhere, but for maximum security this should not be in your web root.  The executable permission is needed on the folder so that the Adapter can examine its contents.  You can see your Queue-Fair settings in the Portal File Manager - they are updated when you hit Make Live.
 
 2) VERY IMPORTANT: Make sure the system clock on your webserver is accurately set to network time! On unix systems, this is usually done with the ntp package.  It doesn't matter which timezone you are using.  For Debian/Ubuntu:
 
-    sudo apt-get install ntp
+    `sudo apt-get install ntp`
 
 3) Go to your Magento installation:
 
-    cd /path/to/magento
+    `cd /path/to/magento`
 
 4) Add the Server Side extension to your composer requirements:
 
-    composer require queue-fair/magentoadapter --no-update
+    `composer require queue-fair/magentoadapter --no-update`
 
 5) Update composer
 
-    composer update
+    `composer update`
 
 6) This will create a new folder `vendor/queue-fair/magentoadapter` and next edit `vendor/queue-fair/magentoadapter/queue-fair-adapter.php`
 
-    nano vendor/queue-fair/magentoadapter/queue-fair-adapter.php
+    `nano vendor/queue-fair/magentoadapter/queue-fair-adapter.php`
 
 7) In `queue-fair-adapter.php` set your account name and account secret to the account System Name and Account Secret shown on the Your Account page of the Queue-Fair portal.  
 
@@ -86,17 +86,17 @@ Note: The settings folder can go anywhere, but for maximum security this should 
 
 The debug logging statements will appear in whichever file php has been set-up to output error message information. If using Apache, it will appear in the apache error.log, and you can see it with
 
-    sudo tail -f /var/log/apache2/error.log | sed 's/\\n/\n/g'
+    `sudo tail -f /var/log/apache2/error.log | sed 's/\\n/\n/g'`
 
 12) When you have finished making changes to `queue-fair-adapter.php`, hit CTRL-O to save and `CTRL-X` to exit nano.
 
 13) To make the Adapter actually run, you need to edit the master Magento index.php file
 
-    nano /path/to/magento/pub/index.php
+    `nano /path/to/magento/pub/index.php`
 
 and just after the opening <?php tag, on the second line, add
 
-    require_once "../vendor/queue-fair/magentoadapter/queue-fair-adapter.php";
+    `require_once "../vendor/queue-fair/magentoadapter/queue-fair-adapter.php";`
 
 This will ensure that the adapter is the first thing that runs when a vistor accesses any page, which is necessary both to protect your server from load from lots of visitors and also so that the adapter can set the necessary cookies.  You can then use the Activation Rules in the Portal to set which pages on your site may trigger a queue.
 
