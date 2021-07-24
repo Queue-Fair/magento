@@ -146,11 +146,9 @@ The Server-Side Adapter contains multiple checks to prevent visitors bypassing t
  - The Server-Side Adapter also checks that Passed Strings coming from our Queue Server to your web server were produced within the last 30 seconds, which is why your clock must be accurately set.
  -  The Server-Side adapater also checks that passed cookies were produced within the time limit set by Passed Lifetime on the queue Settings page, to prevent visitors trying to cheat by tampering with cookie expiration times or sharing cookie values.  So, the Passed Lifetime should be set to long enough for your visitors to complete their transaction, plus an allowance for those visitors that are slow, but no longer.
  - The signature also includes the visitor's USER_AGENT, to further prevent visitors from sharing cookie values.
- - The Adapter is by default configured to let known 'good' bots through without any checks (such as the Google Spider).  For maximum security we recommend removing the good bot check by performing the comment operation indicated in `queue-fair-adapter.php` while people are likely to be queueing, and then reinstating it afterwards.
-
 
 ## AND FINALLY
 
-All customer-modifiable settings are in `queue-fair-adapter.php` .  You should never find you need to modify `queue-fair-adapter-library.php` - but if something comes up, please contact support@queue-fair.com right away so we can discuss your requirements.
+All client-modifiable settings are in `queue-fair-adapter.php` .  You should never find you need to modify `queue-fair-adapter-library.php` - but if something comes up, please contact support@queue-fair.com right away so we can discuss your requirements.
 
 Remember we are here to help you! The integration process shouldn't take you more than an hour - so if you are scratching your head, ask us.  Many answers are contained in the Technical Guide too.  We're always happy to help!
