@@ -121,8 +121,8 @@ In a new Private Browsing window, visit the page on your site.
 
  - Verify that you can see debug output from the Adapter in your error-log.
  - Verify that a cookie has been created named `Queue-Fair-Pass-queuename`, where queuename is the System Name of your queue
- -      If the Adapter is in Safe mode, also verify that a cookie has been created named QueueFair-Store-accountname, where accountname is the System Name of your account (on the Your Account page on the portal).
- -      If the Adapter is in Simple mode, the Queue-Fair-Store cookie is not created.
+ - If the Adapter is in Safe mode, also verify that a cookie has been created named QueueFair-Store-accountname, where accountname is the System Name of your account (on the Your Account page on the portal).
+ - If the Adapter is in Simple mode, the Queue-Fair-Store cookie is not created.
  - Hit Refresh.  Verify that the cookie(s) have not changed their values.
 
 #### Testing Queue
@@ -130,7 +130,7 @@ Go back to the Portal and put the queue in Demo mode on the Queue Settings page.
 
  - Verify that you are now sent to queue.
  - When you come back to the page from the queue, verify that a new QueueFair-Pass-queuename cookie has been created.
- -      If the Adapter is in Safe mode, also verify that the QueueFair-Store cookie has not changed its value.
+ - If the Adapter is in Safe mode, also verify that the QueueFair-Store cookie has not changed its value.
  - Hit Refresh.  Verify that you are not queued again.  Verify that the cookies have not changed their values.
 
 **IMPORTANT:**  Once you are sure the Server-Side Adapter is working as expected, remove the Client-Side JavaScript Adapter tag from your pages, and don't forget to disable debug level logging in queue-fair-adapter.php, and also set settingsFileCacheLifetimeMinutes to at least 5.
