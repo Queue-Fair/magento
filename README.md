@@ -50,7 +50,7 @@ You will need PHP version 5.4 or above to run the Server-Side Adapter.
 
 Here's every keystroke for the install.
 
-- 1 Create a readable, writable and executable folder so that your Queue-Fair settings can be locally saved (necessary for performance of your web server under load):
+- **1.** Create a readable, writable and executable folder so that your Queue-Fair settings can be locally saved (necessary for performance of your web server under load):
 
 ```
     sudo mkdir /opt/qfsettings    
