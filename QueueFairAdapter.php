@@ -38,7 +38,8 @@ class QueueFairAdapter
 
     public $requestedURL = "";
 
-    private $d=true;
+    public $d=true;
+    
     public function __construct($conf)
     {
         $this->config = $conf;
