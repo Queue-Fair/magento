@@ -48,11 +48,14 @@ class QueueFairAdapter
     {
         if (!$this->config->debug) {
             $this->d = false;
+            return;
         }
 
         if ($this->config->debug !== true) {
-            if ($this->remoteAddr != $this->config->debug) 
-               $this->d = false;
+            if ($this->remoteAddr != $this->config->debug) {
+                $this->d = false;
+                return;
+            }
         }
 
         $this->d = true;
