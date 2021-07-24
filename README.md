@@ -115,7 +115,7 @@ and just after the opening `<?php` tag, on the second line, add
 
 ```
 if(strpos($_SERVER["REQUEST_URI"],"/rest/") === false && strpos($_SERVER["REQUEST_URI"],"/ajax/") === false) { 
-    require_once "../vendor/queue-fair/magentoadapter/QueueFairConfig.php";
+    require_once "../vendor/queue-fair/magentoadapter/QueueFairAdapter.php";
     
     $queueFair = new QueueFair\Adapter\QueueFairAdapter(new QueueFair\Adapter\QueueFairConfig());
     
