@@ -47,15 +47,15 @@ class QueueFairAdapter
     protected function setDebug()
     {
         if (!$this->config->debug) {
-            $this->$d = false;
+            $this->d = false;
         }
 
         if ($this->config->debug !== true) {
             if ($this->remoteAddr != $this->config->debug) 
-               $this->$d = false;
+               $this->d = false;
         }
 
-        $this->$d = true;
+        $this->d = true;
     }
 
     protected function log($line, $what)
