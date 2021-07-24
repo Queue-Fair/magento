@@ -11,17 +11,17 @@ To add the Queue-Fair Client-Side JavaScript Adapter to your Magento installatio
 
 Instead, perform the following steps:
 
- 1. Login to your Magento installation as Admin 
- 2. Select Content -> Configuration from the left nav
- 3. To add the Adapter to all pages on your Magento site, tap Edit for the Global record
- 4. In Other Settings, expand HTML Head
- 5. In Scripts and Style Sheets, copy and paste the following line of code: 
-
-`<script data-queue-fair-client="CLIENT_NAME" src="https://files.queue-fair.net/queue-fair-adapter.js"></script>`
-
- 6. Replace CLIENT_NAME with the account system name visibile on the Account -> Your Account page of the Queue-Fair Portal
- 7.  Save Configuration
- 8. Flush Cache when prompted
+ 1) Login to your Magento installation as Admin 
+ 2) Select Content -> Configuration from the left nav
+ 3) To add the Adapter to all pages on your Magento site, tap Edit for the Global record
+ 4) In Other Settings, expand HTML Head
+ 5) In Scripts and Style Sheets, copy and paste the following line of code: 
+```
+<script data-queue-fair-client="CLIENT_NAME" src="https://files.queue-fair.net/queue-fair-adapter.js"></script>`
+```
+ 6) Replace CLIENT_NAME with the account system name visibile on the Account -> Your Account page of the Queue-Fair Portal
+ 7)  Save Configuration
+ 8) Flush Cache when prompted
 
 You shoud now see the Adapter tag when you perform View Source after refreshing your pages.
 
@@ -50,7 +50,7 @@ You will need PHP version 5.4 or above to run the Server-Side Adapter.
 
 Here's every keystroke for the install.
 
-1. Create a readable, writable and executable folder so that your Queue-Fair settings can be locally saved (necessary for performance of your web server under load):
+1) Create a readable, writable and executable folder so that your Queue-Fair settings can be locally saved (necessary for performance of your web server under load):
 
 ```
     sudo mkdir /opt/qfsettings    
@@ -59,45 +59,45 @@ Here's every keystroke for the install.
 
 Note: The settings folder can go anywhere, but for maximum security this should not be in your web root.  The executable permission is needed on the folder so that the Adapter can examine its contents.  You can see your Queue-Fair settings in the Portal File Manager - they are updated when you hit Make Live.
 
-2. **VERY IMPORTANT:** Make sure the system clock on your webserver is accurately set to network time! On unix systems, this is usually done with the ntp package.  It doesn't matter which timezone you are using.  For Debian/Ubuntu:
+2) **VERY IMPORTANT:** Make sure the system clock on your webserver is accurately set to network time! On unix systems, this is usually done with the ntp package.  It doesn't matter which timezone you are using.  For Debian/Ubuntu:
 
 ```
     sudo apt-get install ntp
 ```
 
-3. Go to your Magento installation:
+3) Go to your Magento installation:
 
 ```
     cd /path/to/magento
 ```
 
-4. Add the Server-Side extension to your composer requirements:
+4) Add the Server-Side extension to your composer requirements:
 
 ```
     composer require queue-fair/magentoadapter --no-update
 ```
 
-5. Update composer
+5) Update composer
 
 ```
     composer update
 ```
 
-6. This will create a new folder `/path/to/magento/vendor/queue-fair/magentoadapter` - and next edit `vendor/queue-fair/magentoadapter/QueueFairConfig.php`
+6) This will create a new folder `/path/to/magento/vendor/queue-fair/magentoadapter` - and next edit `vendor/queue-fair/magentoadapter/QueueFairConfig.php`
 
 ```
     nano vendor/queue-fair/magentoadapter/QueueFairConfig.php
 ```
 
-7. At the top of `QueueFairConfig.php` set your account name and account secret to the account System Name and Account Secret shown on the Your Account page of the Queue-Fair portal.  
+7) At the top of `QueueFairConfig.php` set your account name and account secret to the account System Name and Account Secret shown on the Your Account page of the Queue-Fair portal.  
 
-8. Change the `settingsFileCacheLocation` to match the folder path from Step 1)
+8) Change the `settingsFileCacheLocation` to match the folder path from Step 1)
 
-9. Note the `settingsFileCacheLifetimeMinutes` setting - this is how often your web server will check for updated settings from the Queue-Fair queue servers (which change when you hit Make Live).   The default value is 5 minutes.  You can set this to -1 to disable local caching but **DON'T DO THIS** on your production machine/live queue with real people, or your server may collapse under load.
+9) Note the `settingsFileCacheLifetimeMinutes` setting - this is how often your web server will check for updated settings from the Queue-Fair queue servers (which change when you hit Make Live).   The default value is 5 minutes.  You can set this to -1 to disable local caching but **DON'T DO THIS** on your production machine/live queue with real people, or your server may collapse under load.
 
-10. Note the `adapterMode` setting.  "safe" is recommended - we also support "simple" - see the Technical Guide for further details.
+10) Note the `adapterMode` setting.  "safe" is recommended - we also support "simple" - see the Technical Guide for further details.
 
-11. Note the `debug` setting - this is set to true in the version we send you, BUT you MUST set debug to false on production machines/live queues as otherwise your web logs will rapidly become full.  You can safely set it to a single IP address to just output debug information for a single visitor, even on a production machine.
+11) Note the `debug` setting - this is set to true in the version we send you, BUT you MUST set debug to false on production machines/live queues as otherwise your web logs will rapidly become full.  You can safely set it to a single IP address to just output debug information for a single visitor, even on a production machine.
 
 The debug logging statements will appear in whichever file php has been set-up to output error message information. If using Apache, it will appear in the apache error.log, and you can see the messages with
 
@@ -105,7 +105,7 @@ The debug logging statements will appear in whichever file php has been set-up t
     sudo tail -f /var/log/apache2/error.log | sed 's/\\n/\n/g'
 ```
 
-12. When you have finished making changes to `QueueFairConfig.php`, hit `CTRL-O` to save and `CTRL-X` to exit nano.
+12) When you have finished making changes to `QueueFairConfig.php`, hit `CTRL-O` to save and `CTRL-X` to exit nano.
 
 To make the Adapter actually run, you need to edit the master Magento index.php file
 
