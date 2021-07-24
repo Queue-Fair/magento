@@ -358,11 +358,6 @@ class QueueFair
             if ($this->isMatch($queue))
             {
                 if($this->d()) $this->log(__LINE__, "Got a match " . $queue->displayName);
-                if ($this->isBot())
-                {
-                    if($this->d()) $this->log(__LINE__, "Bot detected.");
-                    return;
-                }
 
                 if (!$this->onMatch($queue))
                 {
@@ -1008,25 +1003,6 @@ class QueueFair
         }
     }
 
-    function isBot()
-    {
-        $agent = $_SERVER["HTTP_USER_AGENT"];
-        if($this->d()) $this->log(__LINE__, "User agent is " . $agent);
-        $lim = count($this
-            ->config
-            ->bots);
-        for ($i = 0;$i < $lim;$i++)
-        {
-            $bot = $this
-                ->config
-                ->bots[$i];
-            if (strpos($agent, $bot) !== false)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
     function go()
     {
 
