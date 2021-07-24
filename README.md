@@ -11,17 +11,17 @@ To add the Queue-Fair Client-Side JavaScript Adapter to your Magento installatio
 
 Instead, perform the following steps:
 
- 1) Login to your Magento installation as Admin 
- 2) Select Content -> Configuration from the left nav
- 3) To add the Adapter to all pages on your Magento site, tap Edit for the Global record
- 4) In Other Settings, expand HTML Head
- 5) In Scripts and Style Sheets, copy and paste the following line of code: 
+ - Login to your Magento installation as Admin 
+ - Select Content -> Configuration from the left nav
+ - To add the Adapter to all pages on your Magento site, tap Edit for the Global record
+ - In Other Settings, expand HTML Head
+ - In Scripts and Style Sheets, copy and paste the following line of code: 
 ```
 <script data-queue-fair-client="CLIENT_NAME" src="https://files.queue-fair.net/queue-fair-adapter.js"></script>`
 ```
- 6) Replace CLIENT_NAME with the account system name visibile on the Account -> Your Account page of the Queue-Fair Portal
- 7)  Save Configuration
- 8) Flush Cache when prompted
+ - Replace CLIENT_NAME with the account system name visibile on the Account -> Your Account page of the Queue-Fair Portal
+ - Save Configuration
+ - Flush Cache when prompted
 
 You shoud now see the Adapter tag when you perform View Source after refreshing your pages.
 
