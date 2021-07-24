@@ -2,8 +2,6 @@
 
 namespace QueueFair\Adapter;
 
-require_once "QueueFairAdapter.php";
-
 class QueueFairConfig
 {
     //Your Account Secret is shown on the Your Account page of
