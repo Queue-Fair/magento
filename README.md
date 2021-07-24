@@ -28,6 +28,7 @@ There is a helpful video of these steps in action at https://magefan.com/blog/ho
 
 And you're done!  Your queues and activation rules can now be configured in the Queue-Fair Portal.
 
+---
 ## Server-Side Adapter
 
 The Server-Side Adapter means that your Magento server communicates directly with the Queue-Fair servers, rather than your visitors' browsers.
@@ -51,9 +52,10 @@ Here's every keystroke for the install.
 
 1) Create a readable, writable and executable folder so that your Queue-Fair settings can be locally saved (necessary for performance of your web server under load):
 
-    `sudo mkdir /opt/qfsettings`
-    
-    `sudo chmod 777 /opt/qfsettings`
+```
+    sudo mkdir /opt/qfsettings    
+    `sudo chmod 777 /opt/qfsettings
+```
 
 Note: The settings folder can go anywhere, but for maximum security this should not be in your web root.  The executable permission is needed on the folder so that the Adapter can examine its contents.  You can see your Queue-Fair settings in the Portal File Manager - they are updated when you hit Make Live.
 
