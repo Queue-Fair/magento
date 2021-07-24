@@ -1,4 +1,4 @@
-?# Queue-Fair Adapter Magento Installation Guide
+# Queue-Fair Adapter Magento Installation Guide
 
 Queue-Fair can be added to any Magento installation easily in minutes.  You will need a Queue-Fair account - please visit https://queue-fair.com/free-trial if you don't already have one.  You should also have received our Technical Guide.
 
