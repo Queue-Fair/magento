@@ -52,6 +52,7 @@ Here's every keystroke for the install.
 1) Create a readable, writable and executable folder so that your Queue-Fair settings can be locally saved (necessary for performance of your web server under load):
 
     `sudo mkdir /opt/qfsettings`
+    
     `sudo chmod 777 /opt/qfsettings`
 
 Note: The settings folder can go anywhere, but for maximum security this should not be in your web root.  The executable permission is needed on the folder so that the Adapter can examine its contents.  You can see your Queue-Fair settings in the Portal File Manager - they are updated when you hit Make Live.
