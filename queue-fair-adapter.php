@@ -49,12 +49,6 @@ class QueueFairConfig {
 	//or consult the Adapter server (safe mode).  The recommended value is "safe".
 	public $adapterMode = "safe";
 
-	//A list of common bots for filtering.
-	public $bots = array("duckduckbot","duckduckgo","dotbot","linkedinbot","slurp","applebot","yandexbot","yandeximages","bingbot","bingpreview","sogou spider","seznambot","slackbot","nimbostratus","testbot","googlebot","googlebot","mauibot","semrushbot","ahrefsbot","adsbot","petalbot","aspiegelbot","grapeshot","mj12bot","adsbot-google","barkrowler","intelx.io_bot","bot@linkfluence.com","ltx71","adbeat_bot","facebookexternalhit","the knowledge ai","pandalytics","blexbot","hubspot","bytespider","go-http-client");
-
-	//For MAXIMUM SECUIRTY disable bot exclusion by commenting out the above line and uncommenting the below line.
-// public $bots = array();	
-
 	//Leave this as-is.
 	public function __toString() {
 		return "Config";
