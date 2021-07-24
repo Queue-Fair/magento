@@ -83,7 +83,9 @@ Note: The settings folder can go anywhere, but for maximum security this should 
     composer update
 ```
 
-- This will create a new folder `/path/to/magento/vendor/queue-fair/magentoadapter` - and next edit `vendor/queue-fair/magentoadapter/QueueFairConfig.php`
+This will create a new folder `/path/to/magento/vendor/queue-fair/magentoadapter` 
+
+- Next, edit `vendor/queue-fair/magentoadapter/QueueFairConfig.php`
 
 ```
     nano vendor/queue-fair/magentoadapter/QueueFairConfig.php
