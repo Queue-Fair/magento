@@ -99,9 +99,13 @@ The debug logging statements will appear in whichever file php has been set-up t
 
 and just after the opening `<?php` tag, on the second line, add
 
+if(strpos($_SERVER["REQUEST_URI"],"rest") === false && strpos($_SERVER["REQUEST_URI"],"ajax") === false) {
     require_once "../vendor/queue-fair/magentoadapter/queue-fair-adapter.php";
+}
 
 This will ensure that the adapter is the first thing that runs when a vistor accesses any page, which is necessary both to protect your server from load from lots of visitors and also so that the adapter can set the necessary cookies.  You can then use the Activation Rules in the Portal to set which pages on your site may trigger a queue.
+
+The `if` statement prevents the Adapter from running on background Magento calls - you really only want the Adapter to run on page requests.
 
 In the case where the Adapter sends the request elsewhere (for example to show the user a queue page), the `exit()` method is called by the Adapter and the rest of the page will NOT be generated, which means it isn't sent to the visitor's browser, which makes it secure, as well as preventing your server from having to do the work of producing the rest of the page.
 
@@ -112,8 +116,6 @@ Tap `CTRL-O` to save and `CTRL-X` to exit nano.
 `"autoload" : {
     "classmap" : ["./"]
 }`
-
-14) **RECOMMENDED**: In the Queue-Fair Portal, the first Activation rule should be `If Path DOES NOT Contain ajax`, and the second rule should be `If Path DOES NOT Contain rest`, and the second AND third rules (which would match your domain or specific page) should BOTH have `Logic` set to `AND`.  This is to prevent the Adapter from triggering on Magento AJAX or Rest API calls.  You really only want the adapter to trigger on page views, rather than background requests.
 
 That's it you're done!
 
