@@ -82,15 +82,15 @@ Note: The settings folder can go anywhere, but for maximum security this should 
     composer update
 ```
 
-6) This will create a new folder `/path/to/magento/vendor/queue-fair/magentoadapter` - and next edit `vendor/queue-fair/magentoadapter/queue-fair-adapter.php`
+6) This will create a new folder `/path/to/magento/vendor/queue-fair/magentoadapter` - and next edit `vendor/queue-fair/magentoadapter/QueueFairConfig.php`
 
 ```
-    nano vendor/queue-fair/magentoadapter/queue-fair-adapter.php
+    nano vendor/queue-fair/magentoadapter/QueueFairConfig.php
 ```
 
-7) At the top of `queue-fair-adapter.php` set your account name and account secret to the account System Name and Account Secret shown on the Your Account page of the Queue-Fair portal.  
+7) At the top of `QueueFairConfig.php` set your account name and account secret to the account System Name and Account Secret shown on the Your Account page of the Queue-Fair portal.  
 
-8) Change the `settingsFileCacheLocation` in queue-fair-adapter.php to match the folder path from Step 1)
+8) Change the `settingsFileCacheLocation` to match the folder path from Step 1)
 
 9) Note the `settingsFileCacheLifetimeMinutes` setting - this is how often your web server will check for updated settings from the Queue-Fair queue servers (which change when you hit Make Live).   The default value is 5 minutes.  You can set this to -1 to disable local caching but **DON'T DO THIS** on your production machine/live queue with real people, or your server may collapse under load.
 
@@ -104,7 +104,7 @@ The debug logging statements will appear in whichever file php has been set-up t
     sudo tail -f /var/log/apache2/error.log | sed 's/\\n/\n/g'
 ```
 
-12) When you have finished making changes to `queue-fair-adapter.php`, hit `CTRL-O` to save and `CTRL-X` to exit nano.
+12) When you have finished making changes to `QueueFairConfig.php`, hit `CTRL-O` to save and `CTRL-X` to exit nano.
 
 To make the Adapter actually run, you need to edit the master Magento index.php file
 
@@ -173,7 +173,7 @@ Go back to the Portal and put the queue in Demo mode on the Queue Settings page.
  - If the Adapter is in Safe mode, also verify that the QueueFair-Store cookie has not changed its value.
  - Hit Refresh.  Verify that you are not queued again.  Verify that the cookies have not changed their values.
 
-**IMPORTANT:**  Once you are sure the Server-Side Adapter is working as expected, remove the Client-Side JavaScript Adapter tag from your pages, and don't forget to disable debug level logging in queue-fair-adapter.php, and also set settingsFileCacheLifetimeMinutes to at least 5.
+**IMPORTANT:**  Once you are sure the Server-Side Adapter is working as expected, remove the Client-Side JavaScript Adapter tag from your pages, and don't forget to disable debug level logging in `QueueFairConfig.php`, and also set `settingsFileCacheLifetimeMinutes` to at least 5.
 
 ### For maximum security
 
@@ -187,6 +187,6 @@ The Server-Side Adapter contains multiple checks to prevent visitors bypassing t
 
 ## AND FINALLY
 
-All client-modifiable settings are in `queue-fair-adapter.php` .  You should never find you need to modify `queue-fair-adapter-library.php` - but if something comes up, please contact support@queue-fair.com right away so we can discuss your requirements.
+All client-modifiable settings are in `QueueFairConfig.php` .  You should never find you need to modify `QueueFairAdapter.php` - but if something comes up, please contact support@queue-fair.com right away so we can discuss your requirements.
 
 Remember we are here to help you! The integration process shouldn't take you more than an hour - so if you are scratching your head, ask us.  Many answers are contained in the Technical Guide too.  We're always happy to help!
