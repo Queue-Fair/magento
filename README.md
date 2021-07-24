@@ -39,13 +39,15 @@ The Server-Side Adapter is preferred in the following use cases:
  - where you have technically skilled visitors or high value limited quantity product, and people may attempt to skip the queue, OR
  - where it is anticipated that your web server will not cope with the volume of traffic to your home or landing page AND you do not or cannot use the Direct Link integration method (see Technical Guide).
 
-The Server-Side Adapter is a small PHP library that will run the first time each visitor accesses your site.  If it determines that the visitor should be queued, the visitor is sent to our Queue Servers and execution and generation of the page for that HTTP request for that visitor will cease.  If the Adapter determines that the visitor should not be queued, it sets a cookie to indicate that the visitor has been processed and your page executes and shows as normal.
+The Server-Side Adapter is a small PHP library that will run when visitors access your site.  It periodically checks to see if you have changed your Queue-Fair settings in the Portal, but other than that if the visitor is requesting a page that does not match any queue's Activation Rules, it does nothing.
+
+If a visitor requests a page that DOES match any queue's Activation Rules, the Adapter makes a determination whether that particular visitor should be queued.  If so, the visitor is sent to our Queue Servers and execution and generation of the page for that HTTP request for that visitor will cease.  If the Adapter determines that the visitor should not be queued, it sets a cookie to indicate that the visitor has been processed and your page executes and shows as normal.
 
 Thus the Server-Side Adapter prevents visitors from skipping the queue by disabling the Client-Side JavaScript Adapter, and also reduces load on your Magento server when things get busy.
 
 You will need PHP version 5.4 or above to run the Server-Side Adapter.
 
-Here's every keystroke you need.
+Here's every keystroke for the install.
 
 1) Create a readable, writable and executable folder so that your Queue-Fair settings can be locally saved (necessary for performance of your web server under load):
 
@@ -54,7 +56,7 @@ Here's every keystroke you need.
 
 Note: The settings folder can go anywhere, but for maximum security this should not be in your web root.  The executable permission is needed on the folder so that the Adapter can examine its contents.  You can see your Queue-Fair settings in the Portal File Manager - they are updated when you hit Make Live.
 
-2) VERY IMPORTANT: Make sure the system clock on your webserver is accurately set to network time! On unix systems, this is usually done with the ntp package.  It doesn't matter which timezone you are using.  For Debian/Ubuntu:
+2) **VERY IMPORTANT:** Make sure the system clock on your webserver is accurately set to network time! On unix systems, this is usually done with the ntp package.  It doesn't matter which timezone you are using.  For Debian/Ubuntu:
 
     `sudo apt-get install ntp`
 
@@ -70,25 +72,25 @@ Note: The settings folder can go anywhere, but for maximum security this should 
 
     `composer update`
 
-6) This will create a new folder `vendor/queue-fair/magentoadapter` and next edit `vendor/queue-fair/magentoadapter/queue-fair-adapter.php`
+6) This will create a new folder `/path/to/magento/vendor/queue-fair/magentoadapter` - and next edit `vendor/queue-fair/magentoadapter/queue-fair-adapter.php`
 
     `nano vendor/queue-fair/magentoadapter/queue-fair-adapter.php`
 
-7) In `queue-fair-adapter.php` set your account name and account secret to the account System Name and Account Secret shown on the Your Account page of the Queue-Fair portal.  
+7) At the top of `queue-fair-adapter.php` set your account name and account secret to the account System Name and Account Secret shown on the Your Account page of the Queue-Fair portal.  
 
 8) Change the `settingsFileCacheLocation` in queue-fair-adapter.php to match the folder path from Step 1)
 
-9) Note the `settingsFileCacheLifetimeMinutes` setting - this is how often your web server will check for updated settings from the Queue-Fair queue servers (which change when you hit Make Live).   The default value is 5 minutes.  You can set this to -1 to disable local caching but DON'T DO THIS on your production machine/live queue with real people, or your server may collapse under load.
+9) Note the `settingsFileCacheLifetimeMinutes` setting - this is how often your web server will check for updated settings from the Queue-Fair queue servers (which change when you hit Make Live).   The default value is 5 minutes.  You can set this to -1 to disable local caching but **DON'T DO THIS** on your production machine/live queue with real people, or your server may collapse under load.
 
 10) Note the `adapterMode` setting.  "safe" is recommended - we also support "simple" - see the Technical Guide for further details.
 
-11) Note the `debug` setting - this is set to true in the version we send you, BUT you MUST set debug to false on production machines/live queues as otherwise your web logs will rapidly become full - but you can set it to a single IP address to just output debug information for a single visitor.
+11) Note the `debug` setting - this is set to true in the version we send you, BUT you MUST set debug to false on production machines/live queues as otherwise your web logs will rapidly become full.  You can safely set it to a single IP address to just output debug information for a single visitor, even on a production machine.
 
-The debug logging statements will appear in whichever file php has been set-up to output error message information. If using Apache, it will appear in the apache error.log, and you can see it with
+The debug logging statements will appear in whichever file php has been set-up to output error message information. If using Apache, it will appear in the apache error.log, and you can see the messages with
 
     `sudo tail -f /var/log/apache2/error.log | sed 's/\\n/\n/g'`
 
-12) When you have finished making changes to `queue-fair-adapter.php`, hit CTRL-O to save and `CTRL-X` to exit nano.
+12) When you have finished making changes to `queue-fair-adapter.php`, hit `CTRL-O` to save and `CTRL-X` to exit nano.
 
 13) To make the Adapter actually run, you need to edit the master Magento index.php file
 
@@ -104,7 +106,7 @@ In the case where the Adapter sends the request elsewhere (for example to show t
 
 Tap `CTRL-O` to save and `CTRL-X` to exit nano.  
 
-14) **RECOMMENDED**: In the Queue-Fair Portal, the first Activation rule should be `If Path DOES NOT Contain ajax`, and the second rule should be `If Path DOES NOT Contain rest`, and the second and third rules (which would match your domain or specific page) should have `Logic` set to `AND`.  This is to prevent the adapter from triggering on Magento AJAX or Rest API calls.  You really only want the adapter to trigger on page views, rather than background requests.
+14) **RECOMMENDED**: In the Queue-Fair Portal, the first Activation rule should be `If Path DOES NOT Contain ajax`, and the second rule should be `If Path DOES NOT Contain rest`, and the second AND third rules (which would match your domain or specific page) should BOTH have `Logic` set to `AND`.  This is to prevent the Adapter from triggering on Magento AJAX or Rest API calls.  You really only want the adapter to trigger on page views, rather than background requests.
 
 That's it you're done!
 
@@ -151,5 +153,3 @@ The Server-Side Adapter contains multiple checks to prevent visitors bypassing t
 All customer-modifiable settings are in `queue-fair-adapter.php` .  You should never find you need to modify `queue-fair-adapter-library.php` - but if something comes up, please contact support@queue-fair.com right away so we can discuss your requirements.
 
 Remember we are here to help you! The integration process shouldn't take you more than an hour - so if you are scratching your head, ask us.  Many answers are contained in the Technical Guide too.  We're always happy to help!
-
-
