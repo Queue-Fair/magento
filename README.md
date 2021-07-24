@@ -107,6 +107,12 @@ In the case where the Adapter sends the request elsewhere (for example to show t
 
 Tap `CTRL-O` to save and `CTRL-X` to exit nano.  
 
+**NOTE** /Alternatively/, if you want to use the Queue-Fair classes elsewhere within PHP with Magento (not as the first line of `index.php`, you might want to AutoLoad them.  To do this, add the following lines to /vendor/queue-fair/magentoadapter/composer.json and do a `composer update`
+
+`"autoload" : {
+		"classmap" : ["./"]
+	}`
+
 14) **RECOMMENDED**: In the Queue-Fair Portal, the first Activation rule should be `If Path DOES NOT Contain ajax`, and the second rule should be `If Path DOES NOT Contain rest`, and the second AND third rules (which would match your domain or specific page) should BOTH have `Logic` set to `AND`.  This is to prevent the Adapter from triggering on Magento AJAX or Rest API calls.  You really only want the adapter to trigger on page views, rather than background requests.
 
 That's it you're done!
