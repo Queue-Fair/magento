@@ -3,6 +3,8 @@
 //are thinking of doing this, please contact support@queue-fair.com
 namespace QueueFair\Adapter;
 
+require_once "QueueFairConfig.php";
+
 class QueueFairAdapter
 {
 
