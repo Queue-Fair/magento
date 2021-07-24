@@ -132,11 +132,13 @@ if(strpos($_SERVER["REQUEST_URI"],"/rest/") === false && strpos($_SERVER["REQUES
     unset($queueFair);
 }
 ```
-This will ensure that the adapter is the first thing that runs when a vistor accesses any page, which is necessary both to protect your server from load from lots of visitors and also so that the adapter can set the necessary cookies.  You can then use the Activation Rules in the Portal to set which pages on your site may trigger a queue.  **NOTE:** If your Magento server is sitting behind a proxy, CDN or load balancer, you may need to edit property sets to use values from forwarded headers instead.  If you need help with this, contact Queue-Fair support.
+This will ensure that the adapter is the first thing that runs when a vistor accesses any page, which is necessary both to protect your server from load from lots of visitors and also so that the adapter can set the necessary cookies.  You can then use the Activation Rules in the Portal to set which pages on your site may trigger a queue.
 
 The `if` statement prevents the Adapter from running on background Magento AJAX and RestAPI calls - you really only want the Adapter to run on page requests.
 
 In the case where the Adapter sends the request elsewhere (for example to show the user a queue page), the `go()` method will return false and the rest of the page will NOT be generated, which means it isn't sent to the visitor's browser, which makes it secure, as well as preventing your server from having to do the work of producing the rest of the page.  It is important that this code runs *before* the Magento framework initialises so that your server can perform this under load.
+
+**NOTE:** If your Magento server is sitting behind a proxy, CDN or load balancer, you may need to edit the property sets in the above stanza to use values from forwarded headers instead.  If you need help with this, contact Queue-Fair support.
 
 Tap `CTRL-O` to save and `CTRL-X` to exit nano.  
 
