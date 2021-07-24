@@ -99,11 +99,27 @@ The debug logging statements will appear in whichever file php has been set-up t
 
 and just after the opening `<?php` tag, on the second line, add
 
-`if(strpos($_SERVER["REQUEST_URI"],"/rest/") === false && strpos($_SERVER["REQUEST_URI"],"/ajax/") === false) {
-    require_once "../vendor/queue-fair/magentoadapter/queue-fair-adapter.php";
-}`
+if(strpos($_SERVER["REQUEST_URI"],"/rest/") === false && strpos($_SERVER["REQUEST_URI"],"/ajax/") === false) { 
+	   require_once "../vendor/queue-fair/magentoadapter/QueueFairConfig.php";
+    
+    $queueFairConfig = new QueueFair\Adapter\QueueFairConfig();
+    $queueFair = new QueueFair\Adapter\QueueFairAdapter($queueFairConfig);
+    
+    $queueFair->requestedURL=(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://").$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
+    $queueFair->query=$_SERVER["QUERY_STRING"];
+    $queueFair->remoteAddr=$_SERVER["REMOTE_ADDR"];
+    $queueFair->userAgent=$_SERVER["HTTP_USER_AGENT"];
+    $queueFair->cookies=$_COOKIE;
+    
+    if(!$queueFair->go()) {
+	       exit();
+    }
+//Clean up.
+    unset($queueFair);
+    unset($queueFairConfig);
+}
 
-This will ensure that the adapter is the first thing that runs when a vistor accesses any page, which is necessary both to protect your server from load from lots of visitors and also so that the adapter can set the necessary cookies.  You can then use the Activation Rules in the Portal to set which pages on your site may trigger a queue.
+This will ensure that the adapter is the first thing that runs when a vistor accesses any page, which is necessary both to protect your server from load from lots of visitors and also so that the adapter can set the necessary cookies.  You can then use the Activation Rules in the Portal to set which pages on your site may trigger a queue.  **NOTE:** If your Magento server is sitting behind a proxy, CDN or load balancer, you may need to edit property sets to use values from forwarded headers instead.  If you need help with this, contact Queue-Fair support.
 
 The `if` statement prevents the Adapter from running on background Magento AJAX and RestAPI calls - you really only want the Adapter to run on page requests.
 
