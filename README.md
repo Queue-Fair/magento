@@ -11,8 +11,8 @@ To add the Queue-Fair Client-Side JavaScript Adapter to your Magento installatio
 
 Instead, perform the following steps:
 
- 1) Login to your Magento installation as Admin 
- 2) Select Content -> Configuration from the left nav
+ #1 Login to your Magento installation as Admin 
+ #2 Select Content -> Configuration from the left nav
  3) To add the Adapter to all pages on your Magento site, tap Edit for the Global record
  4) In Other Settings, expand HTML Head
  5) In Scripts and Style Sheets, copy and paste the following line of code: 
