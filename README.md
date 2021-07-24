@@ -6,7 +6,7 @@ Queue-Fair can be added to any Magento installation easily in minutes.  You will
 
 Most of our customers prefer to use the Client-Side JavaScript Adapter, which is suitable for all sites that wish solely to protect against overload.
 
-To add the Queue-Fair Client-Side JavaScript Adapter, you don't need the PHP files included in this extension.
+To add the Queue-Fair Client-Side JavaScript Adapter to your Magento installation, you don't need the PHP files included in this extension.
 
 Instead, perform the following steps:
 
