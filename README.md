@@ -99,9 +99,9 @@ The debug logging statements will appear in whichever file php has been set-up t
 
 and just after the opening `<?php` tag, on the second line, add
 
-if(strpos($_SERVER["REQUEST_URI"],"rest") === false && strpos($_SERVER["REQUEST_URI"],"ajax") === false) {
+`if(strpos($_SERVER["REQUEST_URI"],"rest") === false && strpos($_SERVER["REQUEST_URI"],"ajax") === false) {
     require_once "../vendor/queue-fair/magentoadapter/queue-fair-adapter.php";
-}
+}`
 
 This will ensure that the adapter is the first thing that runs when a vistor accesses any page, which is necessary both to protect your server from load from lots of visitors and also so that the adapter can set the necessary cookies.  You can then use the Activation Rules in the Portal to set which pages on your site may trigger a queue.
 
