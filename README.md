@@ -99,7 +99,7 @@ The debug logging statements will appear in whichever file php has been set-up t
 
 and just after the opening `<?php` tag, on the second line, add
 
-`if(strpos($_SERVER["REQUEST_URI"],"rest") === false && strpos($_SERVER["REQUEST_URI"],"ajax") === false) {
+`if(strpos($_SERVER["REQUEST_URI"],"/rest/") === false && strpos($_SERVER["REQUEST_URI"],"/ajax/") === false) {
     require_once "../vendor/queue-fair/magentoadapter/queue-fair-adapter.php";
 }`
 
