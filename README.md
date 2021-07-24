@@ -99,7 +99,7 @@ This will create a new folder `/path/to/magento/vendor/queue-fair/magentoadapter
 
 - Note the `adapterMode` setting.  "safe" is recommended - we also support "simple" - see the Technical Guide for further details.
 
-- **IMPORTANT** Note the `debug` setting - this is set to true in the version we send you, BUT you MUST set debug to false on production machines/live queues as otherwise your web logs will rapidly become full.  You can safely set it to a single IP address to just output debug information for a single visitor, even on a production machine.
+- **IMPORTANT** Note the `debug` setting - this is set to true by default, BUT you MUST set debug to false on production machines/live queues as otherwise your web logs will rapidly become full.  You can safely set it to a single IP address to just output debug information for a single visitor, even on a production machine.
 
 The debug logging statements will appear in whichever file php has been set-up to output error message information. If using Apache, it will appear in the apache error.log, and you can see the messages with
 
