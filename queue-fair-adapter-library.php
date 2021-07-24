@@ -549,8 +549,8 @@ class QueueFair
                 {
                     setcookie("QueueFair-Store-" . $this
                         ->config->account, "u=" . $this->uid, time() + $this
-                        ->adapterResult
-                        ->cookieSeconds);
+                        ->adapterResult 
+                        ->cookieSeconds, "/");
                 }
             }
         }
