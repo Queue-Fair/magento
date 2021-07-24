@@ -28,7 +28,6 @@ There is a helpful video of these steps in action at https://magefan.com/blog/ho
 
 And you're done!  Your queues and activation rules can now be configured in the Queue-Fair Portal.
 
----
 ## Server-Side Adapter
 
 The Server-Side Adapter means that your Magento server communicates directly with the Queue-Fair servers, rather than your visitors' browsers.
@@ -150,7 +149,7 @@ Tap `CTRL-O` to save and `CTRL-X` to exit nano.
 ```
 
 That's it you're done!
----
+
 ### To test the Server-Side Adapter
 
 Use a queue that is not in use on other pages, or create a new queue for testing.
@@ -176,7 +175,6 @@ Go back to the Portal and put the queue in Demo mode on the Queue Settings page.
 
 **IMPORTANT:**  Once you are sure the Server-Side Adapter is working as expected, remove the Client-Side JavaScript Adapter tag from your pages, and don't forget to disable debug level logging in queue-fair-adapter.php, and also set settingsFileCacheLifetimeMinutes to at least 5.
 
----
 ### For maximum security
 
 The Server-Side Adapter contains multiple checks to prevent visitors bypassing the queue, either by tampering with set cookie values or query strings, or by sharing this information with each other.  When a tamper is detected, the visitor is treated as a new visitor, and will be sent to the back of the queue if people are queuing.
@@ -187,7 +185,6 @@ The Server-Side Adapter contains multiple checks to prevent visitors bypassing t
  -  The Server-Side Adapter also checks that passed cookies were produced within the time limit set by Passed Lifetime on the queue Settings page, to prevent visitors trying to cheat by tampering with cookie expiration times or sharing cookie values.  So, the Passed Lifetime should be set to long enough for your visitors to complete their transaction, plus an allowance for those visitors that are slow, but no longer.
  - The signature also includes the visitor's USER_AGENT, to further prevent visitors from sharing cookie values.
 
----
 ## AND FINALLY
 
 All client-modifiable settings are in `queue-fair-adapter.php` .  You should never find you need to modify `queue-fair-adapter-library.php` - but if something comes up, please contact support@queue-fair.com right away so we can discuss your requirements.
