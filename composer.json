@@ -4,8 +4,5 @@
 	"require" : {
 		"php" : ">=5.4.0"
 	},
-	"license" : "MIT",
-	"autoload" : {
-		"classmap" : ["./"]
-	}
+	"license" : "MIT"
 }
