@@ -106,7 +106,7 @@ The debug logging statements will appear in whichever file php has been set-up t
 
 12) When you have finished making changes to `queue-fair-adapter.php`, hit `CTRL-O` to save and `CTRL-X` to exit nano.
 
-13) To make the Adapter actually run, you need to edit the master Magento index.php file
+To make the Adapter actually run, you need to edit the master Magento index.php file
 
 ```
     nano /path/to/magento/pub/index.php
