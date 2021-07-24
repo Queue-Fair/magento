@@ -88,7 +88,7 @@ Note: The settings folder can go anywhere, but for maximum security this should 
 
 The debug logging statements will appear in whichever file php has been set-up to output error message information. If using Apache, it will appear in the apache error.log, and you can see the messages with
 
-    `sudo tail -f /var/log/apache2/error.log | sed 's/\\n/\n/g'`
+    sudo tail -f /var/log/apache2/error.log | sed 's/\\n/\n/g'
 
 12) When you have finished making changes to `queue-fair-adapter.php`, hit `CTRL-O` to save and `CTRL-X` to exit nano.
 
@@ -98,7 +98,7 @@ The debug logging statements will appear in whichever file php has been set-up t
 
 and just after the opening <?php tag, on the second line, add
 
-    `require_once "../vendor/queue-fair/magentoadapter/queue-fair-adapter.php";`
+    require_once "../vendor/queue-fair/magentoadapter/queue-fair-adapter.php";
 
 This will ensure that the adapter is the first thing that runs when a vistor accesses any page, which is necessary both to protect your server from load from lots of visitors and also so that the adapter can set the necessary cookies.  You can then use the Activation Rules in the Portal to set which pages on your site may trigger a queue.
 
