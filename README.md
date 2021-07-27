@@ -74,7 +74,7 @@ Note: The settings folder can go anywhere, but for maximum security this should 
 **4.** Add the Server-Side extension to your composer requirements:
 
 ```
-    composer require queue-fair/magentoadapter --no-update
+    composer require queue-fair/magento --no-update
 ```
 **5.** Update composer
 
@@ -82,11 +82,11 @@ Note: The settings folder can go anywhere, but for maximum security this should 
     composer update
 ```
 
-This will create a new folder `/path/to/magento/vendor/queue-fair/magentoadapter` 
-**6.** Next, edit `vendor/queue-fair/magentoadapter/QueueFairConfig.php`
+This will create a new folder `/path/to/magento/vendor/queue-fair/magento` 
+**6.** Next, edit `vendor/queue-fair/magento/QueueFairConfig.php`
 
 ```
-    nano vendor/queue-fair/magentoadapter/QueueFairConfig.php
+    nano vendor/queue-fair/magento/QueueFairConfig.php
 ```
 
 **7.** At the top of `QueueFairConfig.php` set your account name and account secret to the account System Name and Account Secret shown on the Your Account page of the Queue-Fair portal.  
@@ -116,7 +116,7 @@ and just after the opening `<?php` tag, on the second line, add
 
 ```
 if(strpos($_SERVER["REQUEST_URI"],"/rest/") === false && strpos($_SERVER["REQUEST_URI"],"/ajax/") === false) { 
-    require_once "../vendor/queue-fair/magentoadapter/QueueFairAdapter.php";
+    require_once "../vendor/queue-fair/magento/QueueFairAdapter.php";
     
     $queueFair = new QueueFair\Adapter\QueueFairAdapter(new QueueFair\Adapter\QueueFairConfig());
     
@@ -143,7 +143,7 @@ In the case where the Adapter sends the request elsewhere (for example to show t
 
 Tap `CTRL-O` to save and `CTRL-X` to exit nano.  
 
-**NOTE** *Alternatively*, if you want to use the Queue-Fair classes elsewhere within PHP with Magento (not as the first line of `index.php`), you might want to AutoLoad them.  This is *not* recommended as loading and running the Magento framework will likely be too onerous when your server is under heavy load, but if you want to do it anyway, add the following lines to /vendor/queue-fair/magentoadapter/composer.json and do a `composer update`
+**NOTE** *Alternatively*, if you want to use the Queue-Fair classes elsewhere within PHP with Magento (not as the first line of `index.php`), you might want to AutoLoad them.  This is *not* recommended as loading and running the Magento framework will likely be too onerous when your server is under heavy load, but if you want to do it anyway, add the following lines to /vendor/queue-fair/magento/composer.json and do a `composer update`
 
 ```
 "autoload" : {
