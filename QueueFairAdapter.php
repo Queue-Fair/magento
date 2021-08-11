@@ -3,8 +3,6 @@
 //are thinking of doing this, please contact support@queue-fair.com
 namespace QueueFair\Adapter;
 
-require_once "QueueFairConfig.php";
-
 class QueueFairAdapter
 {
 
@@ -22,7 +20,7 @@ class QueueFairAdapter
 
     public $passedString = null;
 
-    public $passedQueues = array();
+    public $passedQueues = [];
 
     public $uid = null;
 
@@ -34,7 +32,7 @@ class QueueFairAdapter
 
     public $userAgent="UNSET";
 
-    public $cookies=array();
+    public $cookies=[];
 
     public $requestedURL = "";
 
@@ -98,13 +96,13 @@ class QueueFairAdapter
         $state = false;
 
         $lim = count($arr);
-        for ($i = 0;$i < $lim;$i++) {
+        for ($i = 0; $i < $lim; $i++) {
             $rule = $arr[$i];
 
             if (isset($rule->operator)) {
                 if ($rule->operator == "And" && !$state) {
                     return false;
-                } else if ($rule->operator == "Or" && $state) {
+                } elseif ($rule->operator == "Or" && $state) {
                     return true;
                 }
             }
@@ -114,15 +112,19 @@ class QueueFairAdapter
             if ($firstOp) {
                 $state = $ruleMatch;
                 $firstOp = false;
-                if ($this->d) $this->log(__LINE__, "  Rule 1: " . (($ruleMatch) ? "true" : "false"));
+                if ($this->d) {
+                    $this->log(__LINE__, "  Rule 1: " . (($ruleMatch) ? "true" : "false"));
+                }
             } else {
-                if ($this->d) $this->log(__LINE__, "  Rule " . ($i+1) . ": " . (($ruleMatch) ? "true" : "false"));
+                if ($this->d) {
+                    $this->log(__LINE__, "  Rule " . ($i+1) . ": " . (($ruleMatch) ? "true" : "false"));
+                }
                 if ($rule->operator == "And") {
                     $state = ($state && $ruleMatch);
                     if (!$state) {
                         break;
                     }
-                } else if ($rule->operator == "Or") {
+                } elseif ($rule->operator == "Or") {
                     $state = ($state || $ruleMatch);
                     if ($state) {
                         break;
@@ -131,7 +133,9 @@ class QueueFairAdapter
             }
         }
 
-        if ($this->d) $this->log(__LINE__, "Final result is " . (($state) ? "true" : "false"));
+        if ($this->d) {
+            $this->log(__LINE__, "Final result is " . (($state) ? "true" : "false"));
+        }
 
         return $state;
     }
@@ -144,7 +148,6 @@ class QueueFairAdapter
     protected function endsWith($haystack, $needle)
     {
         return substr_compare($haystack, $needle, -strlen($needle)) === 0;
-
     }
     protected function isRuleMatch($rule)
     {
@@ -154,7 +157,7 @@ class QueueFairAdapter
             $comp = str_replace('https://', '', $comp);
 
             $comp = preg_split("/[\/\?#:]/", $comp) [0];
-        } else if ($rule->component == "Path") {
+        } elseif ($rule->component == "Path") {
             $domain = str_replace("http://", '', $comp);
             $domain = str_replace('https://', '', $domain);
             $domain = preg_split("/[\/\?#:]/", $domain) [0];
@@ -176,15 +179,15 @@ class QueueFairAdapter
             if ($i !== false) {
                 $comp = substr($comp, 0, $i);
             }
-        } else if ($rule->component == "Query") {
+        } elseif ($rule->component == "Query") {
             if (strpos($comp, "?") === false) {
                 $comp = "";
-            } else if ($comp == "?") {
+            } elseif ($comp == "?") {
                 $comp = "";
             } else {
                 $comp = substr($comp, strpos($comp, "?") + 1);
             }
-        } else if ($rule->component == "Cookie") {
+        } elseif ($rule->component == "Cookie") {
             $comp = $this->getCookie($rule->name);
         }
 
@@ -195,15 +198,17 @@ class QueueFairAdapter
             $test = strtolower($test);
         }
 
-        if ($this->d) $this->log(__LINE__, "  Testing " . $rule->component . " " . $test . " against " . $comp);
+        if ($this->d) {
+            $this->log(__LINE__, "  Testing " . $rule->component . " " . $test . " against " . $comp);
+        }
 
         $ret = false;
 
         if ($rule->match == "Equal" && $comp == $test) {
             $ret = true;
-        } else if ($rule->match == "Contain" && $comp != null && $comp != "" && strpos($comp, $test) !== false) {
+        } elseif ($rule->match == "Contain" && $comp != null && $comp != "" && strpos($comp, $test) !== false) {
             $ret = true;
-        } else if ($rule->match == "Exist") {
+        } elseif ($rule->match == "Exist") {
             if (!isset($comp) || $comp == null || "" == comp) {
                 $ret = false;
             } else {
@@ -221,13 +226,17 @@ class QueueFairAdapter
     protected function onMatch($queue)
     {
         if ($this->isPassed($queue)) {
-            if ($this->d) $this->log(__LINE__, "Already passed " . $queue->name . ".");
+            if ($this->d) {
+                $this->log(__LINE__, "Already passed " . $queue->name . ".");
+            }
             return true;
-        } else if (!$this->continuePage) {
+        } elseif (!$this->continuePage) {
             return false;
         }
 
-        if ($this->d) $this->log(__LINE__, "Checking at server " . $queue->displayName);
+        if ($this->d) {
+            $this->log(__LINE__, "Checking at server " . $queue->displayName);
+        }
         $this->consultAdapter($queue);
         return false;
     }
@@ -235,28 +244,38 @@ class QueueFairAdapter
     protected function isPassed($queue)
     {
         if (isset($this->passedQueues[$queue->name])) {
-            if ($this->d) $this->log(__LINE__, "Queue " . $queue->name . " marked as passed already.");
+            if ($this->d) {
+                $this->log(__LINE__, "Queue " . $queue->name . " marked as passed already.");
+            }
             return true;
         }
 
         $queueCookie = $this->getCookie($this->cookieNameBase . $queue->name);
         if (!$queueCookie || $queueCookie == "") {
-            if ($this->d) $this->log(__LINE__, "No cookie found for queue " . $queue->name);
+            if ($this->d) {
+                $this->log(__LINE__, "No cookie found for queue " . $queue->name);
+            }
             return false;
         }
 
         if (strpos($queueCookie, $queue->name) === false) {
-            if ($this->d) $this->log(__LINE__, "Cookie value is invalid for " . $queue->name);
+            if ($this->d) {
+                $this->log(__LINE__, "Cookie value is invalid for " . $queue->name);
+            }
             return false;
         }
 
         if (!$this->validateCookie($queue, $queueCookie)) {
-            if ($this->d) $this->log(__LINE__, "Cookie failed validation " . $queueCookie);
+            if ($this->d) {
+                $this->log(__LINE__, "Cookie failed validation " . $queueCookie);
+            }
             $this->setCookie($queue->name, "", 0, (isset($queue->cookieDomain)) ? $queue->cookieDomain : null);
             return false;
         }
 
-        if ($this->d) $this->log(__LINE__, "Found valid cookie for " . $queue->name);
+        if ($this->d) {
+            $this->log(__LINE__, "Found valid cookie for " . $queue->name);
+        }
         return true;
     }
 
@@ -285,28 +304,37 @@ class QueueFairAdapter
         if ($uidCookie != "") {
             $i = strpos($uidCookie, "=");
             if ($i === false) {
-                if ($this->d) $this->log(__LINE__, "= not found in UID Cookie! " . $uidCookie);
+                if ($this->d) {
+                    $this->log(__LINE__, "= not found in UID Cookie! " . $uidCookie);
+                }
                 $this->uid = $uidCookie;
             } else {
                 $this->uid = substr($uidCookie, $i + 1);
-                if ($this->d) $this->log(__LINE__, "UID set to " . $this->uid);
+                if ($this->d) {
+                    $this->log(__LINE__, "UID set to " . $this->uid);
+                }
             }
         }
     }
 
     protected function gotSettings()
     {
-        if ($this->d) $this->log(__LINE__, "Got client settings.");
+        if ($this->d) {
+            $this->log(__LINE__, "Got client settings.");
+        }
         $this->checkQueryString();
-        if (!$this->continuePage)
+        if (!$this->continuePage) {
             return;
+        }
         $this->parseSettings();
     }
 
     protected function parseSettings()
     {
         if (!$this->settings) {
-            if ($this->d) $this->log(__LINE__, "ERROR: Settings not set.");
+            if ($this->d) {
+                $this->log(__LINE__, "ERROR: Settings not set.");
+            }
             return;
         }
 
@@ -314,26 +342,39 @@ class QueueFairAdapter
             ->settings->queues;
 
         if (count($queues) == 0) {
-            if ($this->d) $this->log(__LINE__, "No queues found.");
+            if ($this->d) {
+                $this->log(__LINE__, "No queues found.");
+            }
             return;
         }
 
         $this->parsing = true;
-        if ($this->d) $this->log(__LINE__, "Running through queue rules");
+        if ($this->d) {
+            $this->log(__LINE__, "Running through queue rules");
+        }
         foreach ($queues as $i => $queue) {
             if (isset($this->passedQueues[$queue->name])) {
-                if ($this->d) $this->log(__LINE__, "Passed from array " . $queue->name);
+                if ($this->d) {
+                    $this->log(__LINE__, "Passed from array " . $queue->name);
+                }
                 continue;
             }
 
-            if ($this->d) $this->log(__LINE__, "Checking " . $queue->displayName);
+            if ($this->d) {
+                $this->log(__LINE__, "Checking " . $queue->displayName);
+            }
             if ($this->isMatch($queue)) {
-                if ($this->d) $this->log(__LINE__, "Got a match " . $queue->displayName);
+                if ($this->d) {
+                    $this->log(__LINE__, "Got a match " . $queue->displayName);
+                }
 
                 if (!$this->onMatch($queue)) {
-                    if (!$this->continuePage)
+                    if (!$this->continuePage) {
                         return;
-                    if ($this->d) $this->log(__LINE__, "Found matching unpassed queue " . $queue->displayName);
+                    }
+                    if ($this->d) {
+                        $this->log(__LINE__, "Found matching unpassed queue " . $queue->displayName);
+                    }
                     if ($this->config->adapterMode == "simple") {
                         return;
                     } else {
@@ -348,33 +389,41 @@ class QueueFairAdapter
                 //Passed.
                 $this->passedQueues[$queue->name] = true;
             } else {
-                if ($this->d) $this->log(__LINE__, "Rules did not match " . $queue->displayName);
+                if ($this->d) {
+                    $this->log(__LINE__, "Rules did not match " . $queue->displayName);
+                }
             }
         }
 
-        if ($this->d) $this->log(__LINE__, "All queues checked.");
+        if ($this->d) {
+            $this->log(__LINE__, "All queues checked.");
+        }
         $this->parsing = false;
     }
 
     protected function consultAdapter($queue)
     {
 
-        if ($this->d) $this->log(
-            __LINE__,
-            "Consulting Adapter Server for queue " . $queue->name." for page ".$this->getURL()
-        );
+        if ($this->d) {
+            $this->log(
+                __LINE__,
+                "Consulting Adapter Server for queue " . $queue->name." for page ".$this->getURL()
+            );
+        }
 
         $this->adapterQueue = $queue;
         $adapterMode = "safe";
 
         if (isset($queue->adapterMode)) {
             $adapterMode = $queue->adapterMode;
-        } else if (isset($this->config->adapterMode)) {
+        } elseif (isset($this->config->adapterMode)) {
             $adapterMode = $this
                 ->config->adapterMode;
         }
 
-        if ($this->d) $this->log(__LINE__, "Adapter mode is " . $adapterMode);
+        if ($this->d) {
+            $this->log(__LINE__, "Adapter mode is " . $adapterMode);
+        }
         if ("safe" == $adapterMode) {
             $url = $this->protocol . "://" . $queue->adapterServer . "/adapter/" . $queue->name;
             $url .= "?ipaddress=" . urlencode($this->remoteAddr);
@@ -384,7 +433,9 @@ class QueueFairAdapter
             }
 
             $url .= "&identifier=" . urlencode($this->processIdentifier($this->userAgent));
-            if ($this->d) $this->log(__LINE__, "Adapter URL " . $url);
+            if ($this->d) {
+                $this->log(__LINE__, "Adapter URL " . $url);
+            }
 
             $json = $this->loadURL($url);
 
@@ -393,18 +444,23 @@ class QueueFairAdapter
                 return;
             }
 
-            if ($this->d) $this->log(__LINE__, "Downloaded JSON Settings " . $json);
+            if ($this->d) {
+                $this->log(__LINE__, "Downloaded JSON Settings " . $json);
+            }
             $this->adapterResult = json_decode($json);
             $this->gotAdapter();
-            if (!$this->continuePage)
-               return;
+            if (!$this->continuePage) {
+                return;
+            }
         } else {
-            $url = $this->protocol . "://" . $queue->queueServer . "/" 
+            $url = $this->protocol . "://" . $queue->queueServer . "/"
                       . $queue->name . "?target=" . urlencode($this->getURL());
 
             $url = $this->appendVariantToRedirectLocation($queue, $url);
 
-            if ($this->d) $this->log(__LINE__, "Redirecting to adapter server " . $url);
+            if ($this->d) {
+                $this->log(__LINE__, "Redirecting to adapter server " . $url);
+            }
 
             $this->redirect($url, 0);
         }
@@ -412,7 +468,9 @@ class QueueFairAdapter
 
     protected function getVariant($queue)
     {
-        if ($this->d) $this->log(__LINE__, "Getting variants for " . $queue->name);
+        if ($this->d) {
+            $this->log(__LINE__, "Getting variants for " . $queue->name);
+        }
         if (!isset($queue->activation)) {
             return null;
         }
@@ -424,14 +482,18 @@ class QueueFairAdapter
         $variantRules = $queue
             ->activation->variantRules;
 
-        if ($this->d) $this->log(__LINE__, "Checking variant rules for " . $queue->name);
+        if ($this->d) {
+            $this->log(__LINE__, "Checking variant rules for " . $queue->name);
+        }
         $lim = count($variantRules);
-        for ($i = 0;$i < $lim;$i++) {
+        for ($i = 0; $i < $lim; $i++) {
             $variant = $variantRules[$i];
             $variantName = $variant->variant;
             $rules = $variant->rules;
             $ret = $this->isMatchArray($rules);
-            if ($this->d) $this->log(__LINE__, "Variant match " . $variantName . " " . $ret);
+            if ($this->d) {
+                $this->log(__LINE__, "Variant match " . $variantName . " " . $ret);
+            }
             if ($ret) {
                 return $variantName;
             }
@@ -447,14 +509,20 @@ class QueueFairAdapter
 
     protected function appendVariantToRedirectLocation($queue, $redirectLoc)
     {
-        if ($this->d) $this->log(__LINE__, "Looking for variant");
+        if ($this->d) {
+            $this->log(__LINE__, "Looking for variant");
+        }
         $variant = $this->getVariant($queue);
         if ($variant == null) {
-            if ($this->d) $this->log(__LINE__, "No variant found");
+            if ($this->d) {
+                $this->log(__LINE__, "No variant found");
+            }
             return $redirectLoc;
         }
 
-        if ($this->d) $this->log(__LINE__, "Found variant " . $variant);
+        if ($this->d) {
+            $this->log(__LINE__, "Found variant " . $variant);
+        }
 
         if (strpos($redirectLoc, "?") !== false) {
             $redirectLoc .= "&";
@@ -468,49 +536,64 @@ class QueueFairAdapter
 
     protected function gotAdapter()
     {
-        if ($this->d) $this->log(__LINE__, "Got adapter");
+        if ($this->d) {
+            $this->log(__LINE__, "Got adapter");
+        }
         if (!$this->adapterResult) {
-            if ($this->d) $this->log(__LINE__, "ERROR: onAdapter() called without result");
+            if ($this->d) {
+                $this->log(__LINE__, "ERROR: onAdapter() called without result");
+            }
             return;
         }
 
         if (isset($this->adapterResult->uid)) {
             if ($this->uid != null && $this->uid != $this->adapterResult->uid) {
                 $this->error(
-                    "UID Cookie Mismatch - Contact Queue-Fair Support! expected " 
+                    "UID Cookie Mismatch - Contact Queue-Fair Support! expected "
                     . $this->uid . " but received " . $this->adapterResult->uid
                 );
             } else {
                 $this->uid = $this
                     ->adapterResult->uid;
-                if (isset($this->adapterQueue->cookieDomain) 
-                    && $this->adapterQueue->cookieDomain != null 
+                if (isset($this->adapterQueue->cookieDomain)
+                    && $this->adapterQueue->cookieDomain != null
                     && $this->adapterQueue->cookieDomain != "") {
                     setcookie(
                         "QueueFair-Store-" . $this
-                        ->config->account, "u=" . $this->uid, time() + $this
-                        ->adapterResult->cookieSeconds, "/", $this
+                        ->config->account,
+                        "u=" . $this->uid,
+                        time() + $this
+                        ->adapterResult->cookieSeconds,
+                        "/",
+                        $this
                         ->adapterQueue
                         ->cookieDomain
                     );
                 } else {
                     setcookie(
                         "QueueFair-Store-" . $this
-                        ->config->account, "u=" . $this->uid, time() + $this
-                        ->adapterResult 
-                        ->cookieSeconds, "/"
+                        ->config->account,
+                        "u=" . $this->uid,
+                        time() + $this
+                        ->adapterResult
+                        ->cookieSeconds,
+                        "/"
                     );
                 }
             }
         }
 
         if (!$this->adapterResult->action) {
-            if ($this->d) $this->log(__LINE__, "ERROR: onAdapter() called without result action");
+            if ($this->d) {
+                $this->log(__LINE__, "ERROR: onAdapter() called without result action");
+            }
             return;
         }
 
         if ($this ->adapterResult->action == "SendToQueue") {
-            if ($this->d) $this->log(__LINE__, "Sending to queue server.");
+            if ($this->d) {
+                $this->log(__LINE__, "Sending to queue server.");
+            }
 
             $queryParams = "";
             $winLoc = $this->getURL();
@@ -534,7 +617,9 @@ class QueueFairAdapter
             }
 
             $redirectLoc = $this->appendVariantToRedirectLocation($this->adapterQueue, $redirectLoc);
-            if ($this->d) $this->log(__LINE__, "Redirecting to " . $redirectLoc);
+            if ($this->d) {
+                $this->log(__LINE__, "Redirecting to " . $redirectLoc);
+            }
             $this->redirect($redirectLoc, 0);
             return;
         }
@@ -542,12 +627,15 @@ class QueueFairAdapter
         //SafeGuard etc
         $this->setCookie(
             $this
-            ->adapterResult->queue, urldecode(
+            ->adapterResult->queue,
+            urldecode(
                 $this
                 ->adapterResult
                 ->validation
-            ), $this
-            ->adapterQueue->passedLifetimeMinutes * 60, (isset(
+            ),
+            $this
+            ->adapterQueue->passedLifetimeMinutes * 60,
+            (isset(
                 $this
                 ->adapterQueue
                 ->cookieDomain
@@ -559,10 +647,13 @@ class QueueFairAdapter
             return;
         }
 
-        if ($this->d) $this->log(
-            __LINE__, "Marking " . $this
-            ->adapterResult->queue . " as passed by adapter."
-        );
+        if ($this->d) {
+            $this->log(
+                __LINE__,
+                "Marking " . $this
+                ->adapterResult->queue . " as passed by adapter."
+            );
+        }
         $this->passedQueues[$this
             ->adapterResult->queue] = true;
     }
@@ -575,12 +666,13 @@ class QueueFairAdapter
 
         header("Location: " . $loc);
         $this->continuePage = false;
-        return;
     }
 
     protected function setCookie($queueName, $value, $lifetimeSeconds, $cookieDomain)
     {
-        if ($this->d) $this->log(__LINE__, "Setting cookie for " . $queueName . " to " . $value);
+        if ($this->d) {
+            $this->log(__LINE__, "Setting cookie for " . $queueName . " to " . $value);
+        }
 
         $cookieName = $this->cookieNameBase . $queueName;
 
@@ -601,7 +693,9 @@ class QueueFairAdapter
                 $loc = $this->getURL();
                 $pos = strpos($loc, "qfqid=");
                 if ($pos !== false) {
-                    if ($this->d) $this->log(__LINE__, "Striping passedString from URL");
+                    if ($this->d) {
+                        $this->log(__LINE__, "Striping passedString from URL");
+                    }
                     $loc = substr($loc, 0, $pos - 1);
                     $this->redirect($loc, 0);
                 }
@@ -611,17 +705,17 @@ class QueueFairAdapter
 
     protected function loadURL($url)
     {
-        $arrContextOptions = array(
-            "http" => array(
+        $arrContextOptions = [
+            "http" => [
                 'timeout' => $this
                     ->config
                     ->readTimeout
-            ) ,
-            "ssl" => array(
+            ] ,
+            "ssl" => [
                 "verify_peer" => false,
                 "verify_peer_name" => false,
-            ) ,
-        );
+            ] ,
+        ];
 
         return file_get_contents($url, false, stream_context_create($arrContextOptions));
     }
@@ -646,16 +740,24 @@ class QueueFairAdapter
         if (file_exists($fileLoc) && ($this
             ->config->settingsFileCacheLifetimeMinutes == - 1 || time() - filemtime($fileLoc) < $this
             ->config->settingsFileCacheLifetimeMinutes * 60)) {
-            if ($this->d) $this->log(__LINE__, "Settngs file found.");
+            if ($this->d) {
+                $this->log(__LINE__, "Settngs file found.");
+            }
             if (!file_exists($lockLoc)) {
-                if ($this->d) $this->log(__LINE__, "Returning settings file.");
+                if ($this->d) {
+                    $this->log(__LINE__, "Returning settings file.");
+                }
                 return file_get_contents($fileLoc);
             }
 
             $lockFound = true;
-            if ($this->d) $this->log(__LINE__, "Lock already exists");
+            if ($this->d) {
+                $this->log(__LINE__, "Lock already exists");
+            }
         } else {
-            if ($this->d) $this->log(__LINE__, "Local copy of settings not found or expired.");
+            if ($this->d) {
+                $this->log(__LINE__, "Local copy of settings not found or expired.");
+            }
         }
 
         if ($lockFound) {
@@ -666,18 +768,24 @@ class QueueFairAdapter
                 if ($i > $this
                     ->config
                     ->readTimeout) {
-                    if ($this->d) $this->log(__LINE__, "Lock timed out");
+                    if ($this->d) {
+                        $this->log(__LINE__, "Lock timed out");
+                    }
                     break;
                 }
             }
 
             //If the lock still exists, another thread has failed.
             if (file_exists($lockLoc)) {
-                if ($this->d) $this->log(__LINE__, "Removing expired lock file.");
+                if ($this->d) {
+                    $this->log(__LINE__, "Removing expired lock file.");
+                }
                 unlink($lockLoc);
                 return false;
             } else {
-                if ($this->d) $this->log(__LINE__, "Lock file has gone - returning cached file.");
+                if ($this->d) {
+                    $this->log(__LINE__, "Lock file has gone - returning cached file.");
+                }
                 return file_get_contents($fileLoc);
             }
         }
@@ -708,7 +816,9 @@ class QueueFairAdapter
                 ->config->accountSecret . "/queue-fair-settings.json";
             $json = $this->loadURL($url);
             if ($json !== false) {
-                if ($this->d) $this->log(__LINE__, "Download of settings successful - saving");
+                if ($this->d) {
+                    $this->log(__LINE__, "Download of settings successful - saving");
+                }
                 $fileLoc = $this
                     ->config->settingsFileCacheLocation . "/queue-fair-settings.json";
                 if (file_exists($fileLoc)) {
@@ -722,7 +832,9 @@ class QueueFairAdapter
 
             unlink($lockLoc);
         } else {
-            if ($this->d) $this->log(__LINE__, "Settings retrieved from cache");
+            if ($this->d) {
+                $this->log(__LINE__, "Settings retrieved from cache");
+            }
         }
 
         if ($json === false) {
@@ -730,7 +842,9 @@ class QueueFairAdapter
             return;
         }
 
-        if ($this->d) $this->log(__LINE__, "Using JSON Settings " . $json);
+        if ($this->d) {
+            $this->log(__LINE__, "Using JSON Settings " . $json);
+        }
 
         $this->settings = json_decode($json);
 
@@ -745,7 +859,9 @@ class QueueFairAdapter
     protected function processIdentifier($parameter)
     {
 
-        if ($parameter == null) return null;
+        if ($parameter == null) {
+            return null;
+        }
         $i = strpos($parameter, "[");
         if ($i === false) {
             return $parameter;
@@ -760,7 +876,9 @@ class QueueFairAdapter
 
     protected function validateCookie($queue, $cookie)
     {
-        if ($this->d) $this->log(__LINE__, "Validating cookie " . $cookie);
+        if ($this->d) {
+            $this->log(__LINE__, "Validating cookie " . $cookie);
+        }
         parse_str($cookie, $parsed);
         if (!isset($parsed["qfh"])) {
             return false;
@@ -773,47 +891,60 @@ class QueueFairAdapter
 
         $checkHash = hash("sha256", $check . $this->processIdentifier($this->userAgent) . $queue->secret);
         if ($hash != $checkHash) {
-            if ($this->d) $this->log(__LINE__, "Cookie Hash Mismatch Given " . $hash . " Should be " . $checkHash);
+            if ($this->d) {
+                $this->log(__LINE__, "Cookie Hash Mismatch Given " . $hash . " Should be " . $checkHash);
+            }
             return false;
         }
 
         $tspos = $parsed["qfts"];
         if ($tspos < time() - ($queue->passedLifetimeMinutes * 60)) {
-            if ($this->d) $this->log(__LINE__, "Cookie timestamp too old " . (time() - $tspos));
+            if ($this->d) {
+                $this->log(__LINE__, "Cookie timestamp too old " . (time() - $tspos));
+            }
             return false;
         }
 
-        if ($this->d) $this->log(__LINE__, "Cookie Validated ");
+        if ($this->d) {
+            $this->log(__LINE__, "Cookie Validated ");
+        }
         return true;
-
     }
 
     protected function validateQuery($queue)
     {
 
         $str = $this->query;
-        $q = array();
+        $q = [];
         parse_str($str, $q);
 
-        if ($this->d) $this->log(__LINE__, "Validating Passed Query " . $str);
+        if ($this->d) {
+            $this->log(__LINE__, "Validating Passed Query " . $str);
+        }
 
         $hpos = strrpos($str, "qfh=");
         if ($hpos == false) {
-            if ($this->d) $this->log(__LINE__, "No Hash In Query");
+            if ($this->d) {
+                $this->log(__LINE__, "No Hash In Query");
+            }
             return false;
         }
 
         $queryHash = $q["qfh"];
 
         if (!isset($queryHash)) {
-            if ($this->d) $this->log(__LINE__, "Malformed hash");
+            if ($this->d) {
+                $this->log(__LINE__, "Malformed hash");
+            }
             return false;
         }
 
         $qpos = strrpos($str, "qfqid=");
 
         if ($qpos === false) {
-            if ($this->d) $this->log(__LINE__, "No Queue Identifier");
+            if ($this->d) {
+                $this->log(__LINE__, "No Queue Identifier");
+            }
             return false;
         }
 
@@ -826,22 +957,30 @@ class QueueFairAdapter
         $queryPassType = $q["qfpt"];
 
         if (!isset($queryTS)) {
-            if ($this->d) $this->log(__LINE__, "No Timestamp");
+            if ($this->d) {
+                $this->log(__LINE__, "No Timestamp");
+            }
             return false;
         }
 
         if (!is_numeric($queryTS)) {
-            if ($this->d) $this->log(__LINE__, "Timestamp Not Numeric");
+            if ($this->d) {
+                $this->log(__LINE__, "Timestamp Not Numeric");
+            }
             return false;
         }
 
         if ($queryTS > time() + $this->config->queryTimeLimitSeconds) {
-            if ($this->d) $this->log(__LINE__, "Too Late " . $queryTS . " " . time());
+            if ($this->d) {
+                $this->log(__LINE__, "Too Late " . $queryTS . " " . time());
+            }
             return false;
         }
 
         if ($queryTS < time() - $this->config->queryTimeLimitSeconds) {
-            if ($this->d) $this->log(__LINE__, "Too Early " . $queryTS . " " . time());
+            if ($this->d) {
+                $this->log(__LINE__, "Too Early " . $queryTS . " " . time());
+            }
             return false;
         }
 
@@ -850,7 +989,9 @@ class QueueFairAdapter
         $checkHash = hash('sha256', $check . $this->processIdentifier($this->userAgent) . $queue->secret);
 
         if ($checkHash != $queryHash) {
-            if ($this->d) $this->log(__LINE__, "Failed Hash");
+            if ($this->d) {
+                $this->log(__LINE__, "Failed Hash");
+            }
             return false;
         }
 
@@ -860,29 +1001,39 @@ class QueueFairAdapter
     protected function checkQueryString()
     {
         $urlParams = $this->getURL();
-        if ($this->d) $this->log(__LINE__, "Checking URL for Passed String " . $urlParams);
+        if ($this->d) {
+            $this->log(__LINE__, "Checking URL for Passed String " . $urlParams);
+        }
         $q = strrpos($urlParams, "qfqid=");
         if ($q === false) {
             return;
         }
 
-        if ($this->d) $this->log(__LINE__, "Passed string found");
+        if ($this->d) {
+            $this->log(__LINE__, "Passed string found");
+        }
         $i = strrpos($urlParams, "qfq=");
-        if ($i === false) return;
-        if ($this->d) $this->log(__LINE__, "Passed String with Queue Name found");
+        if ($i === false) {
+            return;
+        }
+        if ($this->d) {
+            $this->log(__LINE__, "Passed String with Queue Name found");
+        }
 
         $j = strpos($urlParams, "&", $i);
         $subStart = $i + strlen("qfq=");
         $queueName = substr($urlParams, $subStart, $j - $subStart);
 
-        if ($this->d) $this->log(__LINE__, "Queue name is " . $queueName);
+        if ($this->d) {
+            $this->log(__LINE__, "Queue name is " . $queueName);
+        }
         $lim = count(
             $this
             ->settings
             ->queues
         );
 
-        for ($i = 0;$i < $lim;$i++) {
+        for ($i = 0; $i < $lim; $i++) {
             $queue = $this
                 ->settings
                 ->queues[$i];
@@ -890,7 +1041,9 @@ class QueueFairAdapter
                 continue;
             }
 
-            if ($this->d) $this->log(__LINE__, "Found queue for querystring " . $queueName);
+            if ($this->d) {
+                $this->log(__LINE__, "Found queue for querystring " . $queueName);
+            }
             $value = "" . $urlParams;
             $value = substr($value, strrpos($value, "qfqid"));
 
@@ -898,33 +1051,50 @@ class QueueFairAdapter
                 //This can happen if it's a stale query string too - check for valid cookie.
                 $queueCookie = $this->getCookie($this->cookieNameBase . $queueName);
                 if (isset($queueCookie) && "" != $queueCookie) {
-                    if ($this->d) $this->log(__LINE__, "Query validation failed but we have cookie " . $queueCookie);
+                    if ($this->d) {
+                        $this->log(__LINE__, "Query validation failed but we have cookie " . $queueCookie);
+                    }
                     if ($this->validateCookie($queue, $queueCookie)) {
-                        if ($this->d) $this->log(__LINE__, "...and the cookie is valid. That's fine.");
+                        if ($this->d) {
+                            $this->log(__LINE__, "...and the cookie is valid. That's fine.");
+                        }
                         return;
                     }
 
-                    if ($this->d) $this->log(__LINE__, "Query AND Cookie validation failed!!!");
+                    if ($this->d) {
+                        $this->log(__LINE__, "Query AND Cookie validation failed!!!");
+                    }
                 } else {
-                    if ($this->d) $this->log(__LINE__, "Bad queueCookie for " . $queueName . " " . $queueCookie);
+                    if ($this->d) {
+                        $this->log(__LINE__, "Bad queueCookie for " . $queueName . " " . $queueCookie);
+                    }
                 }
 
-                if ($this->d) $this->log(__LINE__, "Query validation failed - redirecting to error page.");
+                if ($this->d) {
+                    $this->log(__LINE__, "Query validation failed - redirecting to error page.");
+                }
                 $loc = $this->protocol . "://" . $queue->queueServer . "/" . $queue->name . "?qferror=InvalidQuery";
                 $this->redirect($loc, 1);
                 return;
             }
 
-            if ($this->d) $this->log(__LINE__, "Query validation succeeded for " . $value);
+            if ($this->d) {
+                $this->log(__LINE__, "Query validation succeeded for " . $value);
+            }
             $this->passedString = $value;
 
             $this->setCookie(
-                $queueName, $value, $queue->passedLifetimeMinutes * 60, 
+                $queueName,
+                $value,
+                $queue->passedLifetimeMinutes * 60,
                 (isset($queue->cookieDomain)) ? $queue->cookieDomain : null
             );
-            if(!$this->continuePage)
+            if (!$this->continuePage) {
                 return;
-            if ($this->d) $this->log(__LINE__, "Marking " . $queueName . " as passed by queryString");
+            }
+            if ($this->d) {
+                $this->log(__LINE__, "Marking " . $queueName . " as passed by queryString");
+            }
             $this->passedQueues[$queueName] = true;
         }
     }
@@ -935,13 +1105,19 @@ class QueueFairAdapter
         try {
             ini_set("allow_url_fopen", 1);
             $this->setDebug();
-            if ($this->d) $this->log(__LINE__, "Adapter Starting for ".$this->getURL());
+            if ($this->d) {
+                $this->log(__LINE__, "Adapter Starting for ".$this->getURL());
+            }
             $this->setUIDFromCookie();
             $this->loadSettings();
-            if ($this->d) $this->log(__LINE__, "Adapter Finished continue page: ".(($this->continuePage) ? "true" : "false"));
-        } catch(\Exception $e) {
+            if ($this->d) {
+                $this->log(__LINE__, "Adapter Finished continue page: ".(($this->continuePage) ? "true" : "false"));
+            }
+        } catch (\Exception $e) {
             error_log($e);
-            if ($this->d) $this->log(__LINE__, "Adapter Finished with Error.");
+            if ($this->d) {
+                $this->log(__LINE__, "Adapter Finished with Error.");
+            }
         }
 
         ini_set("allow_url_fopen", $allowURLFOpenSave);
