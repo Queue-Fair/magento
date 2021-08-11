@@ -5,7 +5,7 @@ namespace QueueFair\Adapter;
 class QueueFairConfig
 {
     //Your Account Secret is shown on the Your Account page of
-    //the Queue-Fair Portal.  If you change it there, you must 
+    //the Queue-Fair Portal.  If you change it there, you must
     //change it here too.
     public $accountSecret="DELETE THIS TEXT AND REPLACE WITH YOUR ACCOUNT SECRET";
     
@@ -20,10 +20,10 @@ class QueueFairConfig
     //before and after the current time
     public $queryTimeLimitSeconds=30;
     
-    //Valid values are true, false, or an "IP_address".	
+    //Valid values are true, false, or an "IP_address".
     public $debug=true;
 
-    //How long to wait in seconds for network reads of config 
+    //How long to wait in seconds for network reads of config
     //or Adapter Server (safe mode only)
     public $readTimeout=5;
 
@@ -35,8 +35,8 @@ class QueueFairConfig
     public $settingsFileCacheLocation="/opt/qfsettings";
 
     //How long a cached copy of your Queue-Fair settings will be kept before downloading
-    //a fresh copy.  Set this to 0 if you are updating your settings in the 
-    //Queue-Fair Portal and want to test your changes quickly, but remember 
+    //a fresh copy.  Set this to 0 if you are updating your settings in the
+    //Queue-Fair Portal and want to test your changes quickly, but remember
     //to set it back again when you are finished to reduce load on your server.
     //Set to -1 to disable downloading entirely.
     public $settingsFileCacheLifetimeMinutes=5;
@@ -53,7 +53,7 @@ class QueueFairConfig
     public $adapterMode = "safe";
 
     //Leave this as-is.
-    public function __toString() 
+    public function __toString()
     {
         return "Config";
     }
