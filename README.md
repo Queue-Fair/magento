@@ -74,7 +74,7 @@ Note: The settings folder can go anywhere, but for maximum security this should 
 **4.** Add the Server-Side extension to your composer requirements:
 
 ```
-    composer require queue-fair/magentoadapter --no-update
+    composer require queue-fair/magadapter --no-update
 ```
 **5.** Update composer
 
@@ -82,11 +82,12 @@ Note: The settings folder can go anywhere, but for maximum security this should 
     composer update
 ```
 
-This will create a new folder `/path/to/magento/vendor/queue-fair/magentoadapter` 
-**6.** Next, edit `vendor/queue-fair/magentoadapter/QueueFairConfig.php`
+This will create a new folder `/path/to/magento/vendor/queue-fair/magadapter` 
+
+**6.** Next, edit `vendor/queue-fair/magadapter/QueueFairConfig.php`
 
 ```
-    nano vendor/queue-fair/magentoadapter/QueueFairConfig.php
+    nano vendor/queue-fair/magadapter/QueueFairConfig.php
 ```
 
 **7.** At the top of `QueueFairConfig.php` set your account name and account secret to the account System Name and Account Secret shown on the Your Account page of the Queue-Fair portal.  
@@ -107,7 +108,7 @@ The debug logging statements will appear in whichever file php has been set-up t
 
 **12.** When you have finished making changes to `QueueFairConfig.php`, hit `CTRL-O` to save and `CTRL-X` to exit nano.
 
-To make the Adapter actually run, you need to edit the master Magento index.php file
+To make the Adapter actually run, you need to edit the master Magento index.php file.  **Make sure you make a back up copy of the index.php file before editing.** 
 
 ```
     nano /path/to/magento/pub/index.php
@@ -116,7 +117,8 @@ and just after the opening `<?php` tag, on the second line, add
 
 ```
 if(strpos($_SERVER["REQUEST_URI"],"/rest/") === false && strpos($_SERVER["REQUEST_URI"],"/ajax/") === false) { 
-    require_once "../vendor/queue-fair/magentoadapter/QueueFairAdapter.php";
+    require_once "../vendor/queue-fair/magadapter/QueueFairConfig.php";
+    require_once "../vendor/queue-fair/magadapter/QueueFairAdapter.php";
     
     $queueFair = new QueueFair\Adapter\QueueFairAdapter(new QueueFair\Adapter\QueueFairConfig());
     
@@ -137,19 +139,11 @@ This will ensure that the adapter is the first thing that runs when a vistor acc
 
 The `if` statement prevents the Adapter from running on background Magento AJAX and RestAPI calls - you really only want the Adapter to run on page requests.
 
-In the case where the Adapter sends the request elsewhere (for example to show the user a queue page), the `go()` method will return false and the rest of the page will NOT be generated, which means it isn't sent to the visitor's browser, which makes it secure, as well as preventing your server from having to do the work of producing the rest of the page.  It is important that this code runs *before* the Magento framework initialises so that your server can perform this under load.
+In the case where the Adapter sends the request elsewhere (for example to show the user a queue page), the `go()` method will return false and the rest of the page will NOT be generated, which means it isn't sent to the visitor's browser, which makes it secure, as well as preventing your server from having to do the work of producing the rest of the page.  It is important that this code runs *before* the Magento framework initialises so that your server can perform this under load, when the full Magento framework is too onerous to load.
 
 **NOTE:** If your Magento server is sitting behind a proxy, CDN or load balancer, you may need to edit the property sets in the above stanza to use values from forwarded headers instead.  If you need help with this, contact Queue-Fair support.
 
-Tap `CTRL-O` to save and `CTRL-X` to exit nano.  
-
-**NOTE** *Alternatively*, if you want to use the Queue-Fair classes elsewhere within PHP with Magento (not as the first line of `index.php`), you might want to AutoLoad them.  This is *not* recommended as loading and running the Magento framework will likely be too onerous when your server is under heavy load, but if you want to do it anyway, add the following lines to /vendor/queue-fair/magentoadapter/composer.json and do a `composer update`
-
-```
-"autoload" : {
-    "classmap" : ["./"]
-}
-```
+Tap `CTRL-O` to save and `CTRL-X` to exit nano.  **You should also back up the index.php file after making your changes** in case it gets overwritten by any future update.
 
 That's it you're done!
 
