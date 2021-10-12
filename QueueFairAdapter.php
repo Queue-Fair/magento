@@ -37,6 +37,10 @@ class QueueFairAdapter
     public $requestedURL = "";
 
     public $d = true;
+
+    public $extra = "";
+
+    public $addedCacheControlHeader = false;
     
     public function __construct($conf)
     {
@@ -62,7 +66,7 @@ class QueueFairAdapter
 
     protected function log($line, $what)
     {
-        error_log("QF Line " . $line . ": " . $what);
+        error_log("QF Line " . $line . ": " . $what."\n");
     }
 
     protected function isMatch($queue)
@@ -86,7 +90,16 @@ class QueueFairAdapter
         );
     }
 
-    protected function isMatchArray($arr)
+    protected function checkAndAddCacheControl()
+    {
+        if($this->addedCacheControlHeader) {
+            return;
+        }
+        $this->addedCacheControlHeader = true;
+        header("Cache-Control: no-store, max-age=0");
+    }
+
+    public function isMatchArray($arr)
     {
         if (!isset($arr)) {
             return false;
@@ -99,7 +112,7 @@ class QueueFairAdapter
         for ($i = 0; $i < $lim; $i++) {
             $rule = $arr[$i];
 
-            if (isset($rule->operator)) {
+            if (!$firstOp && isset($rule->operator)) {
                 if ($rule->operator == "And" && !$state) {
                     return false;
                 } elseif ($rule->operator == "Or" && $state) {
@@ -149,9 +162,10 @@ class QueueFairAdapter
     {
         return substr_compare($haystack, $needle, -strlen($needle)) === 0;
     }
-    protected function isRuleMatch($rule)
-    {
-        $comp = $this->getURL();
+    
+
+    public function extractComponent($rule, $url, $cookieValue) {
+        $comp = $url;
         if ($rule->component == "Domain") {
             $comp = str_replace('http://', '', $comp);
             $comp = str_replace('https://', '', $comp);
@@ -167,7 +181,9 @@ class QueueFairAdapter
                 $i = strpos($comp, "/");
                 if ($i !== false) {
                     $comp = substr($comp, $i);
-                }
+                } else {
+		    $comp = "";
+		}
             }
 
             $i = strpos($comp, "#");
@@ -179,6 +195,9 @@ class QueueFairAdapter
             if ($i !== false) {
                 $comp = substr($comp, 0, $i);
             }
+	    if($comp == "") {
+		$comp = "/";
+	    }
         } elseif ($rule->component == "Query") {
             if (strpos($comp, "?") === false) {
                 $comp = "";
@@ -188,9 +207,18 @@ class QueueFairAdapter
                 $comp = substr($comp, strpos($comp, "?") + 1);
             }
         } elseif ($rule->component == "Cookie") {
-            $comp = $this->getCookie($rule->name);
+            $comp = $cookieValue;
         }
+        return $comp;
+    }
 
+    public function isRuleMatch($rule)
+    {
+        $comp=$this->extractComponent($rule,$this->getURL(),$this->getCookie($rule->name));
+        return $this->isRuleMatchWithValue($rule,$comp);
+    }
+
+    protected function isRuleMatchWithValue($rule, $comp) {
         $test = $rule->value;
 
         if ($rule->caseSensitive == false) {
@@ -215,11 +243,10 @@ class QueueFairAdapter
                 $ret = true;
             }
         }
-
         if ($rule->negate) {
             $ret = !$ret;
         }
-
+        
         return $ret;
     }
 
@@ -229,7 +256,7 @@ class QueueFairAdapter
             if ($this->d) {
                 $this->log(__LINE__, "Already passed " . $queue->name . ".");
             }
-            return true;
+	    return true;
         } elseif (!$this->continuePage) {
             return false;
         }
@@ -304,6 +331,9 @@ class QueueFairAdapter
         if ($uidCookie != "") {
             $i = strpos($uidCookie, "=");
             if ($i === false) {
+		$i = strpos($uidCookie,":");
+	    }
+	    if ($i === false) {
                 if ($this->d) {
                     $this->log(__LINE__, "= not found in UID Cookie! " . $uidCookie);
                 }
@@ -433,6 +463,7 @@ class QueueFairAdapter
             }
 
             $url .= "&identifier=" . urlencode($this->processIdentifier($this->userAgent));
+
             if ($this->d) {
                 $this->log(__LINE__, "Adapter URL " . $url);
             }
@@ -457,7 +488,7 @@ class QueueFairAdapter
                       . $queue->name . "?target=" . urlencode($this->getURL());
 
             $url = $this->appendVariantToRedirectLocation($queue, $url);
-
+	    $url = $this->appendExtraToRedirectLocation($queue, $url);
             if ($this->d) {
                 $this->log(__LINE__, "Redirecting to adapter server " . $url);
             }
@@ -534,6 +565,24 @@ class QueueFairAdapter
         return $redirectLoc;
     }
 
+    protected function appendExtraToRedirectLocation($queue, $redirectLoc)
+    {
+	if ($this->extra === "") {
+	    return $redirectLoc;
+	}
+        $this->log(__LINE__, "Found extra " . $this->extra);
+
+        if (strpos($redirectLoc, "?") !== false) {
+            $redirectLoc .= "&";
+        } else {
+            $redirectLoc .= "?";
+        }
+
+        $redirectLoc .= "qfx=" . urlencode($this->extra);
+        return $redirectLoc;
+    }
+
+
     protected function gotAdapter()
     {
         if ($this->d) {
@@ -561,7 +610,7 @@ class QueueFairAdapter
                     setcookie(
                         "QueueFair-Store-" . $this
                         ->config->account,
-                        "u=" . $this->uid,
+                        "u:" . $this->uid,
                         time() + $this
                         ->adapterResult->cookieSeconds,
                         "/",
@@ -573,7 +622,7 @@ class QueueFairAdapter
                     setcookie(
                         "QueueFair-Store-" . $this
                         ->config->account,
-                        "u=" . $this->uid,
+                        "u:" . $this->uid,
                         time() + $this
                         ->adapterResult
                         ->cookieSeconds,
@@ -617,6 +666,7 @@ class QueueFairAdapter
             }
 
             $redirectLoc = $this->appendVariantToRedirectLocation($this->adapterQueue, $redirectLoc);
+	    $redirectLoc = $this->appendExtraToRedirectLocation($this->adapterQueue, $redirectLoc);
             if ($this->d) {
                 $this->log(__LINE__, "Redirecting to " . $redirectLoc);
             }
@@ -664,6 +714,7 @@ class QueueFairAdapter
             sleep($sleep);
         }
 
+        $this->checkAndAddCacheControl();
         header("Location: " . $loc);
         $this->continuePage = false;
     }
@@ -674,6 +725,7 @@ class QueueFairAdapter
             $this->log(__LINE__, "Setting cookie for " . $queueName . " to " . $value);
         }
 
+        $this->checkAndAddCacheControl();
         $cookieName = $this->cookieNameBase . $queueName;
 
         $date = time();
@@ -874,128 +926,148 @@ class QueueFairAdapter
         return substr($parameter, 0, $i);
     }
 
+    protected function createHash($secret, $message)
+    {
+        return hash_hmac('sha256', $message, $secret);
+    }
+
     protected function validateCookie($queue, $cookie)
     {
         if ($this->d) {
             $this->log(__LINE__, "Validating cookie " . $cookie);
         }
-        parse_str($cookie, $parsed);
-        if (!isset($parsed["qfh"])) {
-            return false;
-        }
 
-        $hash = $parsed["qfh"];
-
-        $hpos = strrpos($cookie, "qfh=");
-        $check = substr($cookie, 0, $hpos);
-
-        $checkHash = hash("sha256", $check . $this->processIdentifier($this->userAgent) . $queue->secret);
-        if ($hash != $checkHash) {
-            if ($this->d) {
-                $this->log(__LINE__, "Cookie Hash Mismatch Given " . $hash . " Should be " . $checkHash);
+        try {
+            parse_str($cookie, $parsed);
+            if (!isset($parsed["qfh"])) {
+                return false;
             }
-            return false;
-        }
 
-        $tspos = $parsed["qfts"];
-        if ($tspos < time() - ($queue->passedLifetimeMinutes * 60)) {
-            if ($this->d) {
-                $this->log(__LINE__, "Cookie timestamp too old " . (time() - $tspos));
+            $hash = $parsed["qfh"];
+
+            $hpos = strrpos($cookie, "qfh=");
+            $check = substr($cookie, 0, $hpos);
+
+            $checkHash = $this->createHash($queue->secret, $this->processIdentifier($this->userAgent).$check);
+
+            if ($hash != $checkHash) {
+                if ($this->d) {
+                    $this->log(__LINE__, "Cookie Hash Mismatch Given " . $hash . " Should be " . $checkHash);
+                }
+                return false;
             }
-            return false;
-        }
 
-        if ($this->d) {
-            $this->log(__LINE__, "Cookie Validated ");
+            $tspos = $parsed["qfts"];
+            if ($tspos < time() - ($queue->passedLifetimeMinutes * 60)) {
+                if ($this->d) {
+                    $this->log(__LINE__, "Cookie timestamp too old " . (time() - $tspos));
+                }
+                return false;
+            }
+
+            if ($this->d) {
+                $this->log(__LINE__, "Cookie Validated ");
+            }
+            return true;
+        } catch (\Exception $e) {
+            if ($this->d) {
+                $this->log(__LINE__, "Cookie validation failed with error ".$e->getMessage());
+            }
         }
-        return true;
+        return false;
     }
 
     protected function validateQuery($queue)
     {
+        try {
+            $str = $this->query;
+            $q = [];
+            parse_str($str, $q);
 
-        $str = $this->query;
-        $q = [];
-        parse_str($str, $q);
-
-        if ($this->d) {
-            $this->log(__LINE__, "Validating Passed Query " . $str);
-        }
-
-        $hpos = strrpos($str, "qfh=");
-        if ($hpos == false) {
             if ($this->d) {
-                $this->log(__LINE__, "No Hash In Query");
+                $this->log(__LINE__, "Validating Passed Query " . $str);
             }
-            return false;
-        }
 
-        $queryHash = $q["qfh"];
+            $hpos = strrpos($str, "qfh=");
+            if ($hpos == false) {
+                if ($this->d) {
+                    $this->log(__LINE__, "No Hash In Query");
+                }
+                return false;
+            }
 
-        if (!isset($queryHash)) {
+            $queryHash = $q["qfh"];
+
+            if (!isset($queryHash)) {
+                if ($this->d) {
+                    $this->log(__LINE__, "Malformed hash");
+                }
+                return false;
+            }
+
+            $qpos = strrpos($str, "qfqid=");
+
+            if ($qpos === false) {
+                if ($this->d) {
+                    $this->log(__LINE__, "No Queue Identifier");
+                }
+                return false;
+            }
+
+            $queryQID = $q["qfqid"];
+            $queryTS = $q["qfts"];
+
+            $queryAccount = $q["qfa"];
+            $queryQueue = $q["qfq"];
+
+            $queryPassType = $q["qfpt"];
+
+            if (!isset($queryTS)) {
+                if ($this->d) {
+                    $this->log(__LINE__, "No Timestamp");
+                }
+                return false;
+            }
+
+            if (!is_numeric($queryTS)) {
+                if ($this->d) {
+                    $this->log(__LINE__, "Timestamp Not Numeric");
+                }
+                return false;
+            }
+
+            if ($queryTS > time() + $this->config->queryTimeLimitSeconds) {
+                if ($this->d) {
+                    $this->log(__LINE__, "Too Late " . $queryTS . " " . time());
+                }
+                return false;
+            }
+
+            if ($queryTS < time() - $this->config->queryTimeLimitSeconds) {
+                if ($this->d) {
+                    $this->log(__LINE__, "Too Early " . $queryTS . " " . time());
+                }
+                return false;
+            }
+
+            $check = substr($str, $qpos, $hpos - $qpos);
+
+            $checkHash = $this->createHash($queue->secret, $this->processIdentifier($this->userAgent).$check);
+
+            if ($checkHash != $queryHash) {
+                if ($this->d) {
+                    $this->log(__LINE__, "Failed Hash");
+                }
+                return false;
+            }
+
+            return true;
+        } catch (\Exception $e) {
             if ($this->d) {
-                $this->log(__LINE__, "Malformed hash");
+                $this->log(__LINE__, "Query validation failed with error ".$e->getMessage());
             }
-            return false;
         }
-
-        $qpos = strrpos($str, "qfqid=");
-
-        if ($qpos === false) {
-            if ($this->d) {
-                $this->log(__LINE__, "No Queue Identifier");
-            }
-            return false;
-        }
-
-        $queryQID = $q["qfqid"];
-        $queryTS = $q["qfts"];
-
-        $queryAccount = $q["qfa"];
-        $queryQueue = $q["qfq"];
-
-        $queryPassType = $q["qfpt"];
-
-        if (!isset($queryTS)) {
-            if ($this->d) {
-                $this->log(__LINE__, "No Timestamp");
-            }
-            return false;
-        }
-
-        if (!is_numeric($queryTS)) {
-            if ($this->d) {
-                $this->log(__LINE__, "Timestamp Not Numeric");
-            }
-            return false;
-        }
-
-        if ($queryTS > time() + $this->config->queryTimeLimitSeconds) {
-            if ($this->d) {
-                $this->log(__LINE__, "Too Late " . $queryTS . " " . time());
-            }
-            return false;
-        }
-
-        if ($queryTS < time() - $this->config->queryTimeLimitSeconds) {
-            if ($this->d) {
-                $this->log(__LINE__, "Too Early " . $queryTS . " " . time());
-            }
-            return false;
-        }
-
-        $check = substr($str, $qpos, $hpos - $qpos);
-
-        $checkHash = hash('sha256', $check . $this->processIdentifier($this->userAgent) . $queue->secret);
-
-        if ($checkHash != $queryHash) {
-            if ($this->d) {
-                $this->log(__LINE__, "Failed Hash");
-            }
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
     protected function checkQueryString()
@@ -1073,7 +1145,7 @@ class QueueFairAdapter
                 if ($this->d) {
                     $this->log(__LINE__, "Query validation failed - redirecting to error page.");
                 }
-                $loc = $this->protocol . "://" . $queue->queueServer . "/" . $queue->name . "?qferror=InvalidQuery";
+                $loc = $this->protocol . "://" . $queue->queueServer . "/" . $queue->name . "?qfError=InvalidQuery";
                 $this->redirect($loc, 1);
                 return;
             }
